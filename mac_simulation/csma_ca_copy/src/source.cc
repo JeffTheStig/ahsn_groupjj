@@ -7,10 +7,17 @@
 
 #include <omnetpp.h>
 #include <math.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
 #include "source.h"
 
 using namespace omnetpp;
+
+#define SUB_CHANNELS true
+
+std::vector<int> overlapping_sources = {4, 0, 3, 5, 6};
 
 namespace csma_ca {
 
@@ -18,10 +25,13 @@ SensorNodeCSMACA::SensorNodeCSMACA()
 {
     // initialize pointers to nullptr
     backoff_timer_expired = nullptr;
-    set_channel_busy = nullptr;
-    set_channel_free = nullptr;
+    set_channel_busy[0] = nullptr;
+    set_channel_free[0] = nullptr;
+    set_channel_busy[1] = nullptr;
+    set_channel_free[1] = nullptr;
     send_message = nullptr;
-    decrease_concurrent_tx_counter = nullptr;
+    decrease_concurrent_tx_counter[0] = nullptr;
+    decrease_concurrent_tx_counter[1] = nullptr;
 }
 
 SensorNodeCSMACA::~SensorNodeCSMACA()
@@ -31,21 +41,33 @@ SensorNodeCSMACA::~SensorNodeCSMACA()
         cancelAndDelete (backoff_timer_expired);
     }
 
-    if (set_channel_busy != nullptr) {
-        cancelAndDelete (set_channel_busy);
+    if (set_channel_busy[0] != nullptr) {
+        cancelAndDelete (set_channel_busy[0]);
     }
 
-    if (set_channel_free != nullptr) {
-        cancelAndDelete (set_channel_free);
+    if (set_channel_free[0] != nullptr) {
+        cancelAndDelete (set_channel_free[0]);
+    }
+
+    if (set_channel_busy[1] != nullptr) {
+            cancelAndDelete (set_channel_busy[1]);
+    }
+
+    if (set_channel_free[1] != nullptr) {
+        cancelAndDelete (set_channel_free[1]);
     }
 
     if (send_message != nullptr) {
         cancelAndDelete (send_message);
     }
 
-    if (decrease_concurrent_tx_counter != nullptr) {
-        cancelAndDelete (decrease_concurrent_tx_counter);
+    if (decrease_concurrent_tx_counter[0] != nullptr) {
+        cancelAndDelete (decrease_concurrent_tx_counter[0]);
     }
+
+    if (decrease_concurrent_tx_counter[1] != nullptr) {
+            cancelAndDelete (decrease_concurrent_tx_counter[1]);
+        }
 }
 
 void SensorNodeCSMACA::initialize()
@@ -82,6 +104,16 @@ void SensorNodeCSMACA::initialize()
         backoff_timer_expired = new cMessage("backoff_timer_expired");
         scheduleAt(simTime() + generate_backoff_time(), backoff_timer_expired);
     }
+
+#if SUB_CHANNELS
+    cModule* c = getModuleByPath("SourceSink");
+    net = (getIndex() >= (int) c->par("n")) ? 1 : 0;
+    net = (std::count(overlapping_sources.begin(), overlapping_sources.end(), getIndex())) ? -1 : net;
+# else
+    net = 0;
+#endif
+
+    EV << "Created source with id " << getIndex() << " on net " << net << endl;
 }
 
 void SensorNodeCSMACA::handleMessage(cMessage *msg)
@@ -92,16 +124,16 @@ void SensorNodeCSMACA::handleMessage(cMessage *msg)
 
         // check if channel is free
         if (perform_cca()){
-
             EV << "Channel is free" << endl;
 
             // change channel state to busy
-            if (set_channel_busy != nullptr) {
-                cancelAndDelete (set_channel_busy);
+            if (net != -1) {
+                setChannelBusy(net);
+            } else {
+                setChannelBusy(0);
+                setChannelBusy(1);
             }
 
-            set_channel_busy = new cMessage("set_channel_busy");
-            scheduleAt(simTime() + D_bp - 0.000001, set_channel_busy);
         }
         else  // channel is busy
         {
@@ -140,77 +172,153 @@ void SensorNodeCSMACA::handleMessage(cMessage *msg)
             }
         }
     }
-    else if (msg==set_channel_busy)
+    else if (msg==set_channel_busy[0])
     {
-        EV << "Set channel busy" << endl;
+        if (net == 0 || net == -1) {
+            EV << "Set channel 0 busy" << endl;
 
-        // set channel state to busy
-        set_channel_state(false);
+            // set channel state to busy
+            set_channel_state(false, 0);
 
-        // send actual message - add 1 microsecond to compensate and start
-        //  at the beginning of the slot
-        if (send_message != nullptr) {
-            cancelAndDelete (send_message);
+            // send actual message - add 1 microsecond to compensate and start
+            //  at the beginning of the slot
+            if (send_message != nullptr) {
+                cancelAndDelete (send_message);
+            }
+
+            send_message = new cMessage("send_message");
+            scheduleAt(simTime() + 0.000001, send_message);
         }
-
-        send_message = new cMessage("send_message");
-        scheduleAt(simTime() + 0.000001, send_message);
     }
-    else if (msg==set_channel_free)
-    {
-        EV << "Set channel free" << endl;
-
-        // set channel state to free
-        set_channel_state(true);
-
-        cModule* c = getModuleByPath("SourceSink");
-
-        if (((int) c->par("concurrent_tx")) <= 1)
+    else if (msg==set_channel_busy[1])
         {
-            // compute packet latency
-            double tmp_lat = 0;
-            tmp_lat = simTime().dbl() - pkt_creation_time;
+            if (net == 1 || net == -1) {
+                EV << "Set channel 1 busy" << endl;
+
+                // set channel state to busy
+                set_channel_state(false, 1);
+
+                // send actual message - add 1 microsecond to compensate and start
+                //  at the beginning of the slot
+                if (send_message != nullptr) {
+                    cancelAndDelete (send_message);
+                }
+
+                send_message = new cMessage("send_message");
+                scheduleAt(simTime() + 0.000001, send_message);
+            }
+        }
+    else if (msg==set_channel_free[0])
+    {
+        if (net == 0 || net == -1) {
+            EV << "Set channel 0 free" << endl;
+
+            // set channel state to free
+            set_channel_state(true, 0);
+
             cModule* c = getModuleByPath("SourceSink");
-            c->par("latency") = ((double) c->par("latency")) + tmp_lat;
-        }
 
-        // decrease counter of transmissions in progress
-        if (decrease_concurrent_tx_counter != nullptr) {
-            cancelAndDelete (decrease_concurrent_tx_counter);
-        }
+            if (((int) c->par("concurrent_tx_net0")) <= 1)
+            {
+                // compute packet latency
+                double tmp_lat = 0;
+                tmp_lat = simTime().dbl() - pkt_creation_time;
+                cModule* c = getModuleByPath("SourceSink");
+                c->par("latency") = ((double) c->par("latency")) + tmp_lat;
+            }
 
-        decrease_concurrent_tx_counter = new cMessage("decrease_concurrent_tx_counter");
-        scheduleAt(simTime() + 0.000001, decrease_concurrent_tx_counter);
+            // decrease counter of transmissions in progress
+            if (decrease_concurrent_tx_counter[0] != nullptr) {
+                cancelAndDelete (decrease_concurrent_tx_counter[0]);
+            }
+
+            decrease_concurrent_tx_counter[0] = new cMessage("decrease_concurrent_tx_counter_0");
+            scheduleAt(simTime() + 0.000001, decrease_concurrent_tx_counter[0]);
+        }
     }
+    else if (msg==set_channel_free[1])
+        {
+            if (net == 1 || net == -1) {
+                EV << "Set channel 1 free" << endl;
+
+                // set channel state to free
+                set_channel_state(true, 1);
+
+                cModule* c = getModuleByPath("SourceSink");
+
+                if (((int) c->par("concurrent_tx_net1")) <= 1)
+                {
+                    // compute packet latency
+                    double tmp_lat = 0;
+                    tmp_lat = simTime().dbl() - pkt_creation_time;
+                    cModule* c = getModuleByPath("SourceSink");
+                    c->par("latency") = ((double) c->par("latency")) + tmp_lat;
+                }
+
+                // decrease counter of transmissions in progress
+                if (decrease_concurrent_tx_counter[1] != nullptr) {
+                    cancelAndDelete (decrease_concurrent_tx_counter[1]);
+                }
+
+                decrease_concurrent_tx_counter[1] = new cMessage("decrease_concurrent_tx_counter_1");
+                scheduleAt(simTime() + 0.000001, decrease_concurrent_tx_counter[1]);
+            }
+        }
+
     else if (msg==send_message)
     {
-        EV << "Send message" << endl;
-
         cModule* c = getModuleByPath("SourceSink");
+
+        int k = 0;
+        if (net == -1) {
+            int n = gateSize("out");
+            int k = intuniform(0, n-1);
+        }
+
+        EV << "Send message on channel " << net << endl;
 
         // update energy consumption
         c->par("energy") = ((double) c->par("energy")) + p_tx * ((double) D_p);
 
         // increase counters
-        c->par("concurrent_tx") = ((int) c->par("concurrent_tx")) + 1;
+        if (net == 0) {
+            c->par("concurrent_tx_net0") = ((int) c->par("concurrent_tx_net0")) + 1;
+        } else if (net == 1) {
+            c->par("concurrent_tx_net1") = ((int) c->par("concurrent_tx_net1")) + 1;
+        }else {
+            c->par("concurrent_tx_net0") = ((int) c->par("concurrent_tx_net0")) + 1;
+            c->par("concurrent_tx_net1") = ((int) c->par("concurrent_tx_net1")) + 1;
+        }
+
         c->par("tx_pkts") = ((int) c->par("tx_pkts")) + 1;
 
         // send actual packet to the sink
         cMessage *data_pkt = new cMessage("data_pkt");
-        send(data_pkt, "out");
+        send(data_pkt, "out", k);
 
         // set channel state to free
-        if (set_channel_free != nullptr) {
-            cancelAndDelete (set_channel_free);
+        if (net != -1) {
+            SensorNodeCSMACA::setChannelFree(net);
+        } else {
+            SensorNodeCSMACA::setChannelFree(0);
+            SensorNodeCSMACA::setChannelFree(1);
         }
 
-        set_channel_free = new cMessage("set_channel_free");
-        scheduleAt(simTime() + D_p, set_channel_free);
     }
-    else if (msg==decrease_concurrent_tx_counter)
+    else if (msg==decrease_concurrent_tx_counter[0])
     {
         cModule* c = getModuleByPath("SourceSink");
-        c->par("concurrent_tx") = ((int) c->par("concurrent_tx")) - 1;
+        c->par("concurrent_tx_net0") = ((int) c->par("concurrent_tx_net0")) - 1;
+
+        // decrease counter and repeat process if there are still packets to send
+        if(net != -1) {
+            decrease_and_repeat(); // Prevent this channel running twice for node on both nets.
+        }
+    }
+    else if (msg==decrease_concurrent_tx_counter[1])
+    {
+        cModule* c = getModuleByPath("SourceSink");
+        c->par("concurrent_tx_net1") = ((int) c->par("concurrent_tx_net1")) - 1;
 
         // decrease counter and repeat process if there are still packets to send
         decrease_and_repeat();
@@ -228,14 +336,30 @@ bool SensorNodeCSMACA::perform_cca()
     // update energy consumption
     c->par("energy") = ((double) c->par("energy")) + p_rx * ((double) T_cca);
 
-    return ((bool) c->par("channel_free"));
+    bool result = false;
+
+    if (net == 0) {
+        result = (bool) c->par("channel_free_net0");
+    } else if (net == 1) {
+        result = (bool) c->par("channel_free_net1");
+    } else {
+        result = (bool) c->par("channel_free_net0") && (bool) c->par("channel_free_net1") ;
+    }
+
+
+    return result;
 }
 
 // set channel_free: true=free, false=busy
-void SensorNodeCSMACA::set_channel_state(bool state)
+void SensorNodeCSMACA::set_channel_state(bool state, int chan)
 {
     cModule* c = getModuleByPath("SourceSink");
-    c->par("channel_free") = state;
+    if (chan == 0) {
+        c->par("channel_free_net0") = state;
+    } else {
+        c->par("channel_free_net1") = state;
+    }
+
 }
 
 // obtain new backoff time
@@ -275,6 +399,33 @@ void SensorNodeCSMACA::decrease_and_repeat()
 void SensorNodeCSMACA::finish()
 {
 
+}
+
+void SensorNodeCSMACA::setChannelBusy(int chan) {
+    if (set_channel_busy[chan] != nullptr) {
+        cancelAndDelete (set_channel_busy[chan]);
+    }
+
+    if (chan == 0) {
+        set_channel_busy[0] = new cMessage("set_channel_busy_net0");
+    } else {
+        set_channel_busy[1] = new cMessage("set_channel_busy_net1");
+    }
+    scheduleAt(simTime() + D_bp - 0.000001, set_channel_busy[chan]);
+}
+
+void SensorNodeCSMACA::setChannelFree(int chan) {
+    // set channel state to free
+    if (set_channel_free[chan] != nullptr) {
+        cancelAndDelete (set_channel_free[chan]);
+    }
+
+    if (chan == 0) {
+        set_channel_free[0] = new cMessage("set_channel_free_net0");
+    } else {
+        set_channel_free[1] = new cMessage("set_channel_free_net1");
+    }
+    scheduleAt(simTime() + D_p, set_channel_free[chan]);
 }
 
 }; // namespace

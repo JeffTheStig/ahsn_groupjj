@@ -16,6 +16,7 @@ class SinkNodeCSMACA : public cSimpleModule
   private:
     int received_pkts;
     int collided;
+    int net;
 
   protected:
     virtual void initialize();

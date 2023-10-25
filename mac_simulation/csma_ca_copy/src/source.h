@@ -6,6 +6,7 @@
  */
 
 #include <omnetpp.h>
+//#include "common.h"
 
 using namespace omnetpp;
 
@@ -15,10 +16,10 @@ class SensorNodeCSMACA : public cSimpleModule
 {
   private:
     cMessage *backoff_timer_expired;
-    cMessage *set_channel_busy;
-    cMessage *set_channel_free;
+    cMessage *set_channel_busy[2];
+    cMessage *set_channel_free[2];
     cMessage *send_message;
-    cMessage *decrease_concurrent_tx_counter;
+    cMessage *decrease_concurrent_tx_counter[2];
     int nb;
     int be;
     int macMinBE;
@@ -33,6 +34,7 @@ class SensorNodeCSMACA : public cSimpleModule
     double pkt_creation_time;
     double p_tx;
     double p_rx;
+    int net;
 
   public:
     SensorNodeCSMACA();
@@ -43,9 +45,11 @@ class SensorNodeCSMACA : public cSimpleModule
     virtual void handleMessage(cMessage *msg);
     virtual void finish();
     bool perform_cca();
-    void set_channel_state(bool state);
+    void set_channel_state(bool state, int chan);
     double generate_backoff_time();
     void decrease_and_repeat();
+    void setChannelBusy(int chan);
+    void setChannelFree(int chan);
 };
 
 Define_Module(SensorNodeCSMACA);

@@ -1,0 +1,230 @@
+version 3
+run General-0-20231025-17:09:04-189146
+attr configname General
+attr datetime 20231025-17:09:04
+attr datetimef 20231025-170904
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network SourceSink
+attr processid 189146
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network SourceSink
+config repeat 10
+config seed-set 0
+config simtime-resolution ps
+config **.macMinBE_value 3
+config **.macMaxBE_value 4
+config **.macMaxCSMABackoffs_value 2
+config SourceSink.n 5
+config **.cmdenv-log-level info
+
+par SourceSink.source[0] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[0] T_value 5s
+attr unit s
+par SourceSink.source[0] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[0] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[0] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[0] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[0] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[0] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[0] pkt_to_send_value 100
+par SourceSink.source[0] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[0] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[1] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[1] T_value 5s
+attr unit s
+par SourceSink.source[1] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[1] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[1] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[1] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[1] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[1] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[1] pkt_to_send_value 100
+par SourceSink.source[1] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[1] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[2] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[2] T_value 5s
+attr unit s
+par SourceSink.source[2] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[2] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[2] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[2] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[2] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[2] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[2] pkt_to_send_value 100
+par SourceSink.source[2] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[2] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[3] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[3] T_value 5s
+attr unit s
+par SourceSink.source[3] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[3] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[3] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[3] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[3] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[3] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[3] pkt_to_send_value 100
+par SourceSink.source[3] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[3] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[4] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[4] T_value 5s
+attr unit s
+par SourceSink.source[4] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[4] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[4] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[4] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[4] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[4] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[4] pkt_to_send_value 100
+par SourceSink.source[4] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[4] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[5] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[5] T_value 5s
+attr unit s
+par SourceSink.source[5] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[5] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[5] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[5] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[5] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[5] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[5] pkt_to_send_value 100
+par SourceSink.source[5] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[5] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[6] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[6] T_value 5s
+attr unit s
+par SourceSink.source[6] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[6] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[6] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[6] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[6] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[6] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[6] pkt_to_send_value 100
+par SourceSink.source[6] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[6] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[7] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[7] T_value 5s
+attr unit s
+par SourceSink.source[7] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[7] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[7] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[7] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[7] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[7] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[7] pkt_to_send_value 100
+par SourceSink.source[7] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[7] p_rx_value 0.0564W
+attr unit W
+par SourceSink.source[8] typename "\"src.SensorNodeCSMACA\""
+par SourceSink.source[8] T_value 5s
+attr unit s
+par SourceSink.source[8] T_cca_value 0.000128s
+attr unit s
+par SourceSink.source[8] D_bp_value 0.00032s
+attr unit s
+par SourceSink.source[8] macMinBE_value 3
+attr prompt macMinBE
+par SourceSink.source[8] macMaxBE_value 4
+attr prompt macMaxBE
+par SourceSink.source[8] macMaxCSMABackoffs_value 2
+attr prompt macMaxCSMABackoffs
+par SourceSink.source[8] D_p_value 0.004256s
+attr unit s
+par SourceSink.source[8] pkt_to_send_value 100
+par SourceSink.source[8] p_tx_value 0.0495W
+attr unit W
+par SourceSink.source[8] p_rx_value 0.0564W
+attr unit W
+par SourceSink.sink[0] typename "\"src.SinkNodeCSMACA\""
+par SourceSink.sink[1] typename "\"src.SinkNodeCSMACA\""
+par SourceSink typename "\"src.SourceSink\""
+par SourceSink n 5
+attr prompt "Number of nodes"
+par SourceSink latency 3.45181
+attr mutable ""
+par SourceSink dropped_pkts 481
+attr mutable ""
+par SourceSink tx_pkts 419
+attr mutable ""
+par SourceSink energy 0.104349
+attr mutable ""
+par SourceSink channel_free_net0 true
+attr mutable ""
+par SourceSink channel_free_net1 true
+attr mutable ""
+par SourceSink concurrent_tx_net0 0
+attr mutable ""
+par SourceSink concurrent_tx_net1 0
+attr mutable ""
+
