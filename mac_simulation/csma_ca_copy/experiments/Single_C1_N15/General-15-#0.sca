@@ -3,7 +3,7 @@ run General-15-0-20231027-13:58:04-94706
 attr configname General-15
 attr datetime 20231027-13:58:04
 attr datetimef 20231027-135804
-attr experiment General-15
+attr experiment Single_C1_N15
 attr inifile omnetpp.ini
 attr iterationvars ""
 attr iterationvarsd ""
