@@ -1,0 +1,127 @@
+file 4188372 1698408249                                         
+version 3
+run General-10-0-20231027-14:04:00-94823
+attr configname General-10
+attr datetime 20231027-14:04:00
+attr datetimef 20231027-140400
+attr experiment General-10
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network SourceSink
+attr processid 94823
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config repeat 10
+config seed-set 0
+config **.macMinBE_value 3
+config **.macMaxBE_value 4
+config **.macMaxCSMABackoffs_value 2
+config SourceSink.n 10
+config **.cmdenv-log-level info
+config network SourceSink
+config repeat 10
+config seed-set 0
+config simtime-resolution ps
+config **.macMinBE_value 3
+config **.macMaxBE_value 4
+config **.macMaxCSMABackoffs_value 2
+config SourceSink.n 5
+config **.cmdenv-log-level info
+
+vector 0 SourceSink stat_avg_energy_cons:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_energy_cons
+attr title "Average energy consumption (per received package) (mJ)"
+vector 1 SourceSink stat_energy_cons:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_energy_cons
+attr title "Total energy consumption (mJ)"
+vector 2 SourceSink stat_avg_latency:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_latency
+attr title "Average latency (per received package) (ms)"
+vector 3 SourceSink stat_pkts_received:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received
+attr title "Total received packets (on the entire network)"
+vector 4 SourceSink.sink[0] stat_pkts_received_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received_net
+attr title "Total amount of collisions received packets (on this sink) "
+vector 5 SourceSink stat_avg_delivery_ratio:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_delivery_ratio
+attr title "Average delivery ratio (%)"
+vector 6 SourceSink stat_avg_retries:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_retries
+attr title "Average amount of retries (per received packet)"
+vector 7 SourceSink stat_retries:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_retries
+attr title "Total amount of retries"
+vector 8 SourceSink stat_collided:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided
+attr title "Total collisions (on the entire network)"
+vector 9 SourceSink.sink[1] stat_collided_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided_net
+attr title "Total amount of collision (on this channel)"
+vector 10 SourceSink stat_pkts_dropped:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_dropped
+attr title "Total dropped packets (dropped due to timeout or collision, on entire network)"
+vector 11 SourceSink stat_pkts_timeout:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_timeout
+attr title "Total packtes that timed-out (dropped)"
+vector 12 SourceSink stat_latency:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_latency
+attr title "Total latency (ms)"
+vector 13 SourceSink.sink[0] stat_collided_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided_net
+attr title "Total amount of collision (on this channel)"
+vector 14 SourceSink.sink[1] stat_pkts_received_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received_net
+attr title "Total amount of collisions received packets (on this sink) "
+0	3715 1036181 1 43018 0 2495.01024 29843 0.2323296 inf inf inf
+1	1039896 966805 1 43017 0 2495.01024 28097 7.2192e-06 0.94340605440038 13253.676059927 8355.0924224161
+2	2006701 123104 6 43019 0.00032 2495.014496 3559 0 11.54748235294 38257.584701679 411787.32379173
+3	2129805 39474 6 43018 0.00032 2495.01024 1746 1 1746 1525131 1775760861
+4	2169279 19883 6 43018 0.00032 2495.01024 898 1 898 403651 241786949
+5	2189162 322496 6 43018 0.00032 2495.01024 9500 10 100 170537.05334691 3071400.1748066
+6	2511658 830233 6 43018 0.00032 2495.01024 24457 0 6.3333333333333 38590.215002572 61144.979966661
+7	3341891 349919 9 43004 0.00064 2495.00608 14957 1 14957 111863403 1115464566915
+8	3691810 42968 12 42957 0.00064 2495.00032 1894 1 1894 1794565 2266535595
+9	3734778 20509 12 42955 0.00064 2495.00032 924 1 924 427350 263390050
+10	3755287 185714 12 43010 0.00064 2495.00928 7754 1 7754 30066135 155431895905
+11	3941001 139745 32 43010 0.00288 2495.00928 5860 1 5860 17172730 67093856110
+12	4080746 65615 42 43019 0.004576 2495.014496 1813 0.004576 18.494367999957 16876.747295978 208904.26772527
+13	4146361 22426 56 42957 0.00576 2495.00032 970 1 970 470935 304694945
+14	4168787 19584 61 43000 0.00608 2495.00544 848 1 848 359976 203626424
+

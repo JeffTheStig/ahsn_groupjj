@@ -1,0 +1,120 @@
+file 1997043 1698408069                                         
+version 3
+run General-0-20231027-14:00:59-94753
+attr configname General
+attr datetime 20231027-14:00:59
+attr datetimef 20231027-140059
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network SourceSink
+attr processid 94753
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network SourceSink
+config repeat 10
+config seed-set 0
+config simtime-resolution ps
+config **.macMinBE_value 3
+config **.macMaxBE_value 4
+config **.macMaxCSMABackoffs_value 2
+config SourceSink.n 5
+config **.cmdenv-log-level info
+
+vector 0 SourceSink stat_avg_energy_cons:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_energy_cons
+attr title "Average energy consumption (per received package) (mJ)"
+vector 1 SourceSink stat_energy_cons:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_energy_cons
+attr title "Total energy consumption (mJ)"
+vector 2 SourceSink stat_avg_latency:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_latency
+attr title "Average latency (per received package) (ms)"
+vector 3 SourceSink stat_pkts_received:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received
+attr title "Total received packets (on the entire network)"
+vector 4 SourceSink.sink[0] stat_pkts_received_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received_net
+attr title "Total amount of collisions received packets (on this sink) "
+vector 5 SourceSink stat_avg_delivery_ratio:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_delivery_ratio
+attr title "Average delivery ratio (%)"
+vector 6 SourceSink stat_avg_retries:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_avg_retries
+attr title "Average amount of retries (per received packet)"
+vector 7 SourceSink stat_retries:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_retries
+attr title "Total amount of retries"
+vector 8 SourceSink.sink[1] stat_pkts_received_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_received_net
+attr title "Total amount of collisions received packets (on this sink) "
+vector 9 SourceSink stat_pkts_timeout:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_timeout
+attr title "Total packtes that timed-out (dropped)"
+vector 10 SourceSink stat_pkts_dropped:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_pkts_dropped
+attr title "Total dropped packets (dropped due to timeout or collision, on entire network)"
+vector 11 SourceSink stat_latency:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_latency
+attr title "Total latency (ms)"
+vector 12 SourceSink stat_collided:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided
+attr title "Total collisions (on the entire network)"
+vector 13 SourceSink.sink[1] stat_collided_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided_net
+attr title "Total amount of collision (on this channel)"
+vector 14 SourceSink.sink[0] stat_collided_net:vector ETV
+attr interpolationmode none
+attr recordingmode vector
+attr source sig_collided_net
+attr title "Total amount of collision (on this channel)"
+0	3525 506509 1 23289 0 2495.01024 14700 0.2178912 inf inf inf
+1	510034 435989 1 23289 0 2495.01024 12950 7.2192e-06 0.59398252800013 3857.326821754 1531.8396495846
+2	946023 124293 4 23290 0.00032 2495.010336 3615 0 9.7898666666641 34123.6629461 322735.55064954
+3	1070316 39076 4 23282 0.00032 2495.00608 1750 1 1750 1532125 1787989875
+4	1109392 20418 4 23251 0.00032 2495.00032 935 1 935 437580 272904060
+5	1129810 151147 4 23289 0.00032 2495.01024 4500 37.451737451737 100 175055.24786157 6822965.0663327
+6	1280957 352958 4 23289 0.00032 2495.01024 10490 0 5 13996.803954558 18741.385894189
+7	1633915 136083 7 23283 0.00096 2495.0064 5990 1 5990 17943045 71658540715
+8	1769998 17799 11 23282 0.00096 2495.00608 815 1 815 332520 180780040
+9	1787797 45425 19 23289 0.00352 2495.01024 2040 1 2040 2081820 2831969140
+10	1833222 64491 19 23289 0.00352 2495.01024 2750 1 2750 3782625 6936073375
+11	1897713 67021 21 23290 0.004576 2495.010336 1865 0.004576 16.571039999957 15475.155999976 170934.64407633
+12	1964734 16208 184 23276 20.00032 2495.00512 710 1 710 252405 119555835
+13	1980942 7704 184 23041 20.00032 2470.00544 340 1 340 57970 13159190
+14	1988646 8396 185 23276 20.00032 2495.00512 370 1 370 68635 16952845
+
