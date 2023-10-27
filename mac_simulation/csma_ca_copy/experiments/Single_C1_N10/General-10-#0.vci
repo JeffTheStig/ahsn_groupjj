@@ -1,10 +1,10 @@
-file 4082246 1698407744                                         
-version 3
+file 4082249 1698410197                                         
+version 2
 run General-10-0-20231027-13:55:25-94672
 attr configname General-10
 attr datetime 20231027-13:55:25
 attr datetimef 20231027-135525
-attr experiment General-10
+attr experiment Single_C1_N10
 attr inifile omnetpp.ini
 attr iterationvars ""
 attr iterationvarsd ""
@@ -39,89 +39,88 @@ attr interpolationmode none
 attr recordingmode vector
 attr source sig_avg_energy_cons
 attr title "Average energy consumption (per received package) (mJ)"
+0	3718 978757 1 39282 0 2495.01152 29031 0.2323296 inf inf inf
 vector 1 SourceSink stat_energy_cons:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_energy_cons
 attr title "Total energy consumption (mJ)"
+1	982475 974562 1 39282 0 2495.01152 28296 7.2192e-06 0.76315932480034 10825.719507257 5521.5652268896
 vector 2 SourceSink stat_retries:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_retries
 attr title "Total amount of retries"
+2	1957037 376069 3 39264 0.00032 2495.00672 16049 1 16049 128793225 1378044576425
 vector 3 SourceSink stat_avg_retries:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_avg_retries
 attr title "Average amount of retries (per received packet)"
+3	2333106 866296 3 39282 0.00032 2495.01152 25549 1.6647398843931 inf inf inf
 vector 4 SourceSink stat_avg_latency:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_avg_latency
 attr title "Average latency (per received package) (ms)"
+4	3199402 50766 6 39283 0.00032 2495.014176 1470 0 11.649684210526 16521.919166883 186092.32975139
 vector 5 SourceSink stat_pkts_received:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_pkts_received
 attr title "Total received packets (on the entire network)"
+5	3250168 16233 6 39279 0.00032 2495.00992 735 1 735 270480 132625360
 vector 6 SourceSink.sink[0] stat_pkts_received_net:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_pkts_received_net
 attr title "Total amount of collisions received packets (on this sink) "
+6	3266401 9169 6 38934 0.00032 2475.00992 418 1 418 87571 24432309
 vector 7 SourceSink stat_avg_delivery_ratio:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_avg_delivery_ratio
 attr title "Average delivery ratio (%)"
+7	3275570 322251 6 39282 0.00032 2495.01152 9500 6.25 100 74298.115359977 593833.75003817
 vector 8 SourceSink stat_pkts_timeout:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_pkts_timeout
 attr title "Total packtes that timed-out (dropped)"
+8	3597821 154694 29 39282 0.00288 2495.01152 6753 1 6753 22804881 102675175889
 vector 9 SourceSink stat_pkts_dropped:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_pkts_dropped
 attr title "Total dropped packets (dropped due to timeout or collision, on entire network)"
+9	3752515 201498 29 39282 0.00288 2495.01152 8765 1 8765 38416995 224496113115
 vector 10 SourceSink stat_latency:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_latency
 attr title "Total latency (ms)"
+10	3954013 26594 38 39283 0.004576 2495.014176 735 0.004576 8.3646399999826 3070.5372799961 17133.005474152
 vector 11 SourceSink stat_collided:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_collided
 attr title "Total collisions (on the entire network)"
+11	3980607 47709 50 39258 0.00512 2495.00512 2012 1 2012 2025078 2716979650
 vector 12 SourceSink.sink[1] stat_collided_net:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_collided_net
 attr title "Total amount of collision (on this channel)"
+12	4028316 21794 50 39258 0.00512 2495.00512 942 1 942 444153 279076135
 vector 13 SourceSink.sink[0] stat_collided_net:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_collided_net
 attr title "Total amount of collision (on this channel)"
+13	4050110 24865 51 39256 0.00512 2495.00512 1070 1 1070 572985 408920295
 vector 14 SourceSink.sink[1] stat_pkts_received_net:vector ETV
 attr interpolationmode none
 attr recordingmode vector
 attr source sig_pkts_received_net
 attr title "Total amount of collisions received packets (on this sink) "
-0	3715 978757 1 39282 0 2495.01152 29031 0.2323296 inf inf inf
-1	982472 974562 1 39282 0 2495.01152 28296 7.2192e-06 0.76315932480034 10825.719507257 5521.5652268896
-2	1957034 376069 3 39264 0.00032 2495.00672 16049 1 16049 128793225 1378044576425
-3	2333103 866296 3 39282 0.00032 2495.01152 25549 1.6647398843931 inf inf inf
-4	3199399 50766 6 39283 0.00032 2495.014176 1470 0 11.649684210526 16521.919166883 186092.3297514
-5	3250165 16233 6 39279 0.00032 2495.00992 735 1 735 270480 132625360
-6	3266398 9169 6 38934 0.00032 2475.00992 418 1 418 87571 24432309
-7	3275567 322251 6 39282 0.00032 2495.01152 9500 6.25 100 74298.115359977 593833.75003817
-8	3597818 154694 29 39282 0.00288 2495.01152 6753 1 6753 22804881 102675175889
-9	3752512 201498 29 39282 0.00288 2495.01152 8765 1 8765 38416995 224496113115
-10	3954010 26594 38 39283 0.004576 2495.014176 735 0.004576 8.3646399999826 3070.5372799961 17133.005474152
-11	3980604 47709 50 39258 0.00512 2495.00512 2012 1 2012 2025078 2716979650
-12	4028313 21794 50 39258 0.00512 2495.00512 942 1 942 444153 279076135
-13	4050107 24865 51 39256 0.00512 2495.00512 1070 1 1070 572985 408920295
-14	4074972 7273 75 39279 0.01056 2495.00992 317 1 317 50403 10668635
-
+14	4074975 7274 75 39279 0.01056 2495.00992 317 1 317 50403 10668635
