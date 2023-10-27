@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<analysis version="2">
+    <inputs>
+        <input pattern="/csma_ca_copy/experiments/multi_C2_N10/General-10-*.vec"/>
+        <input pattern="/csma_ca_copy/experiments/multi_C2_N10/General-10-*.sca"/>
+    </inputs>
+    <charts/>
+</analysis>

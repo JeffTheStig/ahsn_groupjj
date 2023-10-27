@@ -17,7 +17,10 @@ using namespace omnetpp;
 
 #define SUB_CHANNELS true
 
-std::vector<int> overlapping_sources = {4, 0, 3, 5, 6};
+
+//std::vector<int> overlapping_sources = {2, 3, 4, 5, 6}; // Net of n = 5
+//std::vector<int> overlapping_sources = {7, 8, 9, 10, 11}; // Net of n = 10
+std::vector<int> overlapping_sources = {12, 13, 14, 15, 16}; // Net of n = 15
 
 namespace csma_ca {
 

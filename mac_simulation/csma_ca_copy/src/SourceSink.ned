@@ -17,7 +17,7 @@ simple SensorNodeCSMACA
         int macMaxBE_value @prompt("macMaxBE") = default(4);
         int macMaxCSMABackoffs_value @prompt("macMaxCSMABackoffs") = default(2);
         double D_p_value @unit(s) = default(0.004256s);
-        int pkt_to_send_value = default(100);
+        int pkt_to_send_value = default(500);
         double p_tx_value @unit(W) = default(0.0495W);
         double p_rx_value @unit(W) = default(0.0564W);
         @display("i=block/source");
@@ -86,8 +86,8 @@ network SourceSink
         for i=n-1..((2*n)-2) {
             source[i].out++ --> sink[1].in++;
         }
-        source[0].out++ --> sink[1].in++;
-        source[3].out++ --> sink[1].in++;
-        source[5].out++ --> sink[0].in++;
-        source[6].out++ --> sink[0].in++;
+        source[n-2].out++ --> sink[1].in++;
+        source[n-3].out++ --> sink[1].in++;
+        source[n].out++ --> sink[0].in++;
+        source[n+1].out++ --> sink[0].in++;
 }
