@@ -1,5 +1,5 @@
-file 12308 1698758032                                           
-version 3
+file 12308 1699359929                                           
+version 2
 run General-0-20231031-14:13:02-10078
 attr configname General
 attr datetime 20231031-14:13:02
@@ -57,6 +57,7 @@ attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
 attr title "frame sequence active"
+0	11604 16 0 0 0 0 2 0 0 0 0
 vector 1 Scenario.host[0].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -64,6 +65,7 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
 attr title "queue length"
 attr unit pk
+1	11620 40 0 0 0 0 5 0 0 0 0
 vector 2 Scenario.host[0].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -71,39 +73,46 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
 attr title "queue bit length"
 attr unit b
+2	11660 40 0 0 0 0 5 0 0 0 0
 vector 3 Scenario.host[0].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
 attr title "queue length"
+3	11700 16 0 0 0 0 2 0 0 0 0
 vector 4 Scenario.host[0].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(backoffStarted)-count(backoffStopped))
 attr title "backoff active"
+4	11716 16 0 0 0 0 2 0 0 0 0
 vector 5 Scenario.host[0].udp passedUpPk:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetSentToUpper
 attr title "packets passed up, count"
+5	11732 8 0 0 0 0 1 0 0 0 0
 vector 6 Scenario.host[0].udp droppedPkWrongPort:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsNoPortFound(packetDropped)
 attr title "packets dropped (wrong port), count"
+6	11740 8 0 0 0 0 1 0 0 0 0
 vector 7 Scenario.host[0].udp droppedPkBadChecksum:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
 attr title "packets dropped (checksum error), count"
+7	11748 8 0 0 0 0 1 0 0 0 0
 vector 8 Scenario.host[1].wlan[0].mac.dcf frameSequenceActive:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
 attr title "frame sequence active"
+8	11756 16 0 0 0 0 2 0 0 0 0
 vector 9 Scenario.host[1].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -111,6 +120,7 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
 attr title "queue length"
 attr unit pk
+9	11772 40 0 0 0 0 5 0 0 0 0
 vector 10 Scenario.host[1].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -118,39 +128,46 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
 attr title "queue bit length"
 attr unit b
+10	11812 45 0 0 0 0 5 0 0 0 0
 vector 11 Scenario.host[1].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
 attr title "queue length"
+11	11857 18 0 0 0 0 2 0 0 0 0
 vector 12 Scenario.host[1].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(backoffStarted)-count(backoffStopped))
 attr title "backoff active"
+12	11875 18 0 0 0 0 2 0 0 0 0
 vector 13 Scenario.host[1].udp passedUpPk:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetSentToUpper
 attr title "packets passed up, count"
+13	11893 9 0 0 0 0 1 0 0 0 0
 vector 14 Scenario.host[1].udp droppedPkWrongPort:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsNoPortFound(packetDropped)
 attr title "packets dropped (wrong port), count"
+14	11902 9 0 0 0 0 1 0 0 0 0
 vector 15 Scenario.host[1].udp droppedPkBadChecksum:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
 attr title "packets dropped (checksum error), count"
+15	11911 9 0 0 0 0 1 0 0 0 0
 vector 16 Scenario.host[2].wlan[0].mac.dcf frameSequenceActive:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(frameSequenceStarted)-count(frameSequenceFinished))
 attr title "frame sequence active"
+16	11920 18 0 0 0 0 2 0 0 0 0
 vector 17 Scenario.host[2].wlan[0].mac.dcf.channelAccess.pendingQueue queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -158,6 +175,7 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + count(packetPushStarted) - count(packetPulled) - count(packetRemoved) - count(packetDropped)))"
 attr title "queue length"
 attr unit pk
+17	11938 45 0 0 0 0 5 0 0 0 0
 vector 18 Scenario.host[2].wlan[0].mac.dcf.channelAccess.pendingQueue queueBitLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
@@ -165,145 +183,126 @@ attr recordingmode vector
 attr source "warmup(atomic(constant0(packetPushEnded) + sum(packetLength(packetPushStarted)) - sum(packetLength(packetPulled)) - sum(packetLength(packetRemoved)) - sum(packetLength(packetDropped))))"
 attr title "queue bit length"
 attr unit b
+18	11983 45 0 0 0 0 5 0 0 0 0
 vector 19 Scenario.host[2].wlan[0].mac.dcf.channelAccess.inProgressFrames queueLength:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source "warmup(count(packetEnqueued) - count(packetDequeued))"
 attr title "queue length"
+19	12028 18 0 0 0 0 2 0 0 0 0
 vector 20 Scenario.host[2].wlan[0].mac.dcf.channelAccess.contention backoffActive:vector ETV
 attr autoWarmupFilter false
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source warmup(count(backoffStarted)-count(backoffStopped))
 attr title "backoff active"
+20	12046 18 0 0 0 0 2 0 0 0 0
 vector 21 Scenario.host[2].udp passedUpPk:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetSentToUpper
 attr title "packets passed up, count"
+21	12064 9 0 0 0 0 1 0 0 0 0
 vector 22 Scenario.host[2].udp droppedPkWrongPort:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsNoPortFound(packetDropped)
 attr title "packets dropped (wrong port), count"
+22	12073 9 0 0 0 0 1 0 0 0 0
 vector 23 Scenario.host[2].udp droppedPkBadChecksum:vector(count) ETV
 attr interpolationmode none
 attr recordingmode vector(count)
 attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
 attr title "packets dropped (checksum error), count"
+23	12082 9 0 0 0 0 1 0 0 0 0
 vector 24 Scenario.host[0].wlan[0].radio radioMode:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioModeChanged
 attr title "Radio mode"
+24	12091 27 0 0 0 0 3 0 2 2 4
 vector 25 Scenario.host[0].wlan[0].radio radioChannel:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioChannelChanged
 attr title "Radio channel"
+25	12118 9 0 0 0 0 1 0 0 0 0
 vector 26 Scenario.host[1].wlan[0].radio radioMode:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioModeChanged
 attr title "Radio mode"
+26	12127 27 0 0 0 0 3 0 2 2 4
 vector 27 Scenario.host[1].wlan[0].radio radioChannel:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioChannelChanged
 attr title "Radio channel"
+27	12154 9 0 0 0 0 1 0 0 0 0
 vector 28 Scenario.host[2].wlan[0].radio radioMode:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioModeChanged
 attr title "Radio mode"
+28	12163 27 0 0 0 0 3 0 2 2 4
 vector 29 Scenario.host[2].wlan[0].radio radioChannel:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source radioChannelChanged
 attr title "Radio channel"
+29	12190 9 0 0 0 0 1 0 0 0 0
 vector 30 Scenario.host[0].wlan[0].radio receptionState:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source receptionStateChanged
 attr title "Radio reception state"
+30	12199 9 0 0 0 0 1 1 1 1 1
 vector 31 Scenario.host[0].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
 attr enum IDLE,DEFER,IFS_AND_BACKOFF
 attr interpolationmode none
 attr recordingmode vector
 attr title "contention state changed"
 attr type enum
+31	12208 18 0 0 0 0 2 0 0 0 0
 vector 32 Scenario.host[1].wlan[0].radio receptionState:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source receptionStateChanged
 attr title "Radio reception state"
+32	12226 9 0 0 0 0 1 1 1 1 1
 vector 33 Scenario.host[1].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
 attr enum IDLE,DEFER,IFS_AND_BACKOFF
 attr interpolationmode none
 attr recordingmode vector
 attr title "contention state changed"
 attr type enum
+33	12235 18 0 0 0 0 2 0 0 0 0
 vector 34 Scenario.host[2].wlan[0].radio receptionState:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr source receptionStateChanged
 attr title "Radio reception state"
+34	12253 9 0 0 0 0 1 1 1 1 1
 vector 35 Scenario.host[2].wlan[0].mac.dcf.channelAccess.contention stateChanged:vector ETV
 attr enum IDLE,DEFER,IFS_AND_BACKOFF
 attr interpolationmode none
 attr recordingmode vector
 attr title "contention state changed"
 attr type enum
+35	12262 18 0 0 0 0 2 0 0 0 0
 vector 36 Scenario.host[0].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr title "contention window"
+36	12280 9 0 0 0 0 1 7 7 7 49
 vector 37 Scenario.host[1].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr title "contention window"
+37	12289 9 0 0 0 0 1 7 7 7 49
 vector 38 Scenario.host[2].wlan[0].mac.dcf.recoveryProcedure contentionWindowChanged:vector ETV
 attr interpolationmode sample-hold
 attr recordingmode vector
 attr title "contention window"
-0	11604 16 0 0 0 0 2 0 0 0 0
-1	11620 40 0 0 0 0 5 0 0 0 0
-2	11660 40 0 0 0 0 5 0 0 0 0
-3	11700 16 0 0 0 0 2 0 0 0 0
-4	11716 16 0 0 0 0 2 0 0 0 0
-5	11732 8 0 0 0 0 1 0 0 0 0
-6	11740 8 0 0 0 0 1 0 0 0 0
-7	11748 8 0 0 0 0 1 0 0 0 0
-8	11756 16 0 0 0 0 2 0 0 0 0
-9	11772 40 0 0 0 0 5 0 0 0 0
-10	11812 45 0 0 0 0 5 0 0 0 0
-11	11857 18 0 0 0 0 2 0 0 0 0
-12	11875 18 0 0 0 0 2 0 0 0 0
-13	11893 9 0 0 0 0 1 0 0 0 0
-14	11902 9 0 0 0 0 1 0 0 0 0
-15	11911 9 0 0 0 0 1 0 0 0 0
-16	11920 18 0 0 0 0 2 0 0 0 0
-17	11938 45 0 0 0 0 5 0 0 0 0
-18	11983 45 0 0 0 0 5 0 0 0 0
-19	12028 18 0 0 0 0 2 0 0 0 0
-20	12046 18 0 0 0 0 2 0 0 0 0
-21	12064 9 0 0 0 0 1 0 0 0 0
-22	12073 9 0 0 0 0 1 0 0 0 0
-23	12082 9 0 0 0 0 1 0 0 0 0
-24	12091 27 0 0 0 0 3 0 2 2 4
-25	12118 9 0 0 0 0 1 0 0 0 0
-26	12127 27 0 0 0 0 3 0 2 2 4
-27	12154 9 0 0 0 0 1 0 0 0 0
-28	12163 27 0 0 0 0 3 0 2 2 4
-29	12190 9 0 0 0 0 1 0 0 0 0
-30	12199 9 0 0 0 0 1 1 1 1 1
-31	12208 18 0 0 0 0 2 0 0 0 0
-32	12226 9 0 0 0 0 1 1 1 1 1
-33	12235 18 0 0 0 0 2 0 0 0 0
-34	12253 9 0 0 0 0 1 1 1 1 1
-35	12262 18 0 0 0 0 2 0 0 0 0
-36	12280 9 0 0 0 0 1 7 7 7 49
-37	12289 9 0 0 0 0 1 7 7 7 49
-38	12298 9 0 0 0 0 1 7 7 7 49
-
+38	12298 10 0 0 0 0 1 7 7 7 49
