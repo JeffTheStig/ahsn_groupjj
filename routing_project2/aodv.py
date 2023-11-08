@@ -1,16 +1,24 @@
 import sys, json, pickle
 # from socket import *
 import os.path
+import random
+import math
 
 #------------------------------------------------------------------
 # Functions
 #------------------------------------------------------------------
 class MainNodeHandler:
     def __init__(self):
-        
+        num_nodes = 10
         self.nodes = dict()
-        self.nodes["A"] = AodvNode(self, "A", ["B"], (50,50), ["B", "B", 0, "inf", ["B"], True])
-        self.nodes["B"] = AodvNode(self, "B", ["A"], (75,75), ["A", "A", 0, "inf", ["A"], True])
+        #self.nodes["A"] = AodvNode(self, "A", ["B"], (0,0), ["B", "B", 0, "inf", ["B"], True])
+        #self.nodes["B"] = AodvNode(self, "B", ["A"], (0,0), ["A", "A", 0, "inf", ["A"], True])
+        for i in range(num_nodes):
+            node_id = chr(ord('A') + i)
+            neighbours = []
+            coords = (random.uniform(0, 100), random.uniform(0, 100))
+            routing_table = []
+            self.nodes[node_id] = AodvNode(self, node_id, neighbours, coords, routing_table)
 
     def sendMessage(self, id: str, message: str):
         if id in self.nodes:
@@ -18,6 +26,29 @@ class MainNodeHandler:
 
     def getNodes(self):
         return self.nodes
+
+    def find_neighbours(self, max_range):
+        for node_x_id, node_x in self.nodes.items():
+            for node_y_id, node_y in self.nodes.items():
+                if node_x_id == node_y_id:
+                    continue
+
+                x_diff = node_x.coords[0] - node_y.coords[0]
+                y_diff = node_x.coords[1] - node_y.coords[1]
+                curr_dist = math.sqrt((x_diff * x_diff) + (y_diff * y_diff))
+
+                if curr_dist <= max_range:
+                    if node_y_id not in node_x.neighbours:
+                        node_x.neighbours.append(node_y.nodeId)
+                        node_y.neighbours.append(node_x.nodeId)
+                else:
+                    if node_y_id in node_x.neighbours:
+                        node_x.neighbours.remove(node_y_id)
+                        node_y.neighbours.remove(node_x_id)
+
+        print("Finished finding neighbours!")
+        for node_x_id, node_x in self.nodes.items():
+            print(node_x_id, " neighbhours:", node_x.neighbours)
 
 
 class AodvNode:
@@ -45,7 +76,7 @@ class AodvNode:
         self.neighbour_timeout_arg = None
 
         print("---------------------------")
-        print(self.nodeId)
+        print("node:", self.nodeId, " coordinates:", self.coords)
         print("---------------------------")
 
         print("-----------------------------------------")
