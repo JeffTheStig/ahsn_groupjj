@@ -66,10 +66,10 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
         graph.MoveFigure(dots[i][3], gx - gpx, gy - gpy) # Range
         graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y) # Label
 
-def reset_sim(window: sg.Window):
+def reset_sim(window: sg.Window, nodes):
     running = False
     run_step = 0
-    mnh = MainNodeHandler()
+    mnh = MainNodeHandler(nodes)
     dots = draw_nodes(window, mnh.nodes)
     print("Reset!")
 
@@ -122,7 +122,7 @@ def main_gui():
         event, values = window.read(timeout=20)
 
         if mnh == None:
-            mnh = MainNodeHandler()
+            mnh = MainNodeHandler(nodes)
             dots = draw_nodes(window, mnh.nodes)
 
         # Close if event is exit.
@@ -142,6 +142,7 @@ def main_gui():
 
         if event == "-NODES-" and values["-NODES-"].isdigit():
             nodes = int(values["-NODES-"])
+            reset_sim(window, nodes)
             print(f"Updated nodes to {nodes}")
 
         if event == "-RANGE-" and values["-RANGE-"].isdigit():
