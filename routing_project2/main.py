@@ -138,7 +138,7 @@ def main_gui():
             running = False
 
         if event == "-RESET-":
-            running, run_step, mnh, dots = reset_sim(window)
+            running, run_step, mnh, dots = reset_sim(window, nodes)
 
         if event == "-NODES-" and values["-NODES-"].isdigit():
             nodes = int(values["-NODES-"])
