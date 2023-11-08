@@ -13,7 +13,9 @@ LABEL_MOD_X = 0
 LABEL_MOD_Y = 0
 LABEL_SIZE = 9
 #max send/receive range of nodes
-MAX_RANGE = 10
+MAX_RANGE = 20
+NUM_NODES = 20
+STEP_SIZE = 10
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -82,6 +84,7 @@ def main_gui():
     Creates the window and acts accordingly on mouse clicks.
     """
     global MAX_RANGE
+    global STEP_SIZE
 
     # Total layout of the program. Also adds a terminal output window.
     layout = [
@@ -98,6 +101,7 @@ def main_gui():
                 [sg.HSeparator()],
                 [sg.Text("Nodes: "), sg.InputText("10", enable_events=True, key="-NODES-", size=(5, 1))],
                 [sg.Text("Node range: "), sg.InputText("10", enable_events=True, key="-RANGE-", size=(5, 1))],
+                [sg.Text("Node step size: "), sg.InputText("2", enable_events=True, key="-NODE-STEPS-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
 
             ]),
@@ -111,7 +115,7 @@ def main_gui():
 
     mnh = None
     running = False
-    nodes = 10
+    nodes = NUM_NODES
     sim_steps = 100
     run_step = 0
     dots = []
@@ -150,6 +154,10 @@ def main_gui():
             draw_nodes(window, mnh.nodes)
             print(f"Updated range to {MAX_RANGE}")
 
+        if event == "-NODE-STEPS-" and values["-NODE-STEPS-"].isdigit():
+            STEP_SIZE = int(values["-NODE-STEPS-"])
+            print(f"Updated node step size to {STEP_SIZE}")
+
         if event == "-SIM-STEPS-" and values["-SIM-STEPS-"].isdigit():
             sim_steps = int(values["-SIM-STEPS-"])
             print(f"Updated sim steps to {sim_steps}")
@@ -157,6 +165,7 @@ def main_gui():
         if running and run_step < sim_steps:
             run_step += 1
             # while (1):
+            mnh.move_nodes(STEP_SIZE, NODE_COORD_WIDTH, NODE_COORD_HEIGHT)
             mnh.find_neighbours(MAX_RANGE)
             for _, n in mnh.nodes.items():
                 n.event_loop()
