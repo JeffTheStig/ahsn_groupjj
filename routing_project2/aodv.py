@@ -8,11 +8,8 @@ import math
 # Functions
 #------------------------------------------------------------------
 class MainNodeHandler:
-    def __init__(self):
-        num_nodes = 10
+    def __init__(self, num_nodes):
         self.nodes = dict()
-        #self.nodes["A"] = AodvNode(self, "A", ["B"], (0,0), ["B", "B", 0, "inf", ["B"], True])
-        #self.nodes["B"] = AodvNode(self, "B", ["A"], (0,0), ["A", "A", 0, "inf", ["A"], True])
         for i in range(num_nodes):
             node_id = chr(ord('A') + i)
             neighbours = []

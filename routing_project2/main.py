@@ -10,7 +10,8 @@ NODE_COORD_WIDTH = 100
 NODE_COORD_HEIGHT = 100
 
 #max send/receive range of nodes
-MAX_RANGE = 10
+MAX_RANGE = 20
+NUM_NODES = 20
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -62,7 +63,7 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
 def reset_sim(window: sg.Window):
     running = False
     run_step = 0
-    mnh = MainNodeHandler()
+    mnh = MainNodeHandler(NUM_NODES)
     dots = draw_nodes(window, mnh.nodes)
     print("Reset!")
 
@@ -88,7 +89,7 @@ def main_gui():
                 [sg.Button("Pause", key="-PAUSE-")],
                 [sg.Button("Reset", key="-RESET-")],
                 [sg.HSeparator()],
-                [sg.Text("Nodes: "), sg.InputText("10", enable_events=True, key="-NODES-", size=(5, 1))],
+                [sg.Text("Nodes: "), sg.InputText(NUM_NODES, enable_events=True, key="-NODES-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
 
             ]),
@@ -102,7 +103,7 @@ def main_gui():
 
     mnh = None
     running = False
-    nodes = 10
+    nodes = NUM_NODES
     sim_steps = 100
     run_step = 0
     dots = []
@@ -113,7 +114,7 @@ def main_gui():
         event, values = window.read(timeout=20)
 
         if mnh == None:
-            mnh = MainNodeHandler()
+            mnh = MainNodeHandler(NUM_NODES)
             dots = draw_nodes(window, mnh.nodes)
 
         # Close if event is exit.
