@@ -16,6 +16,12 @@ class MainNodeHandler:
             coords = (random.uniform(0, 100), random.uniform(0, 100))
             routing_table = []
             self.nodes[node_id] = AodvNode(self, node_id, neighbours, coords, routing_table)
+        
+        self.RREQ_count = 0
+        self.packet_created = 0
+        self.packet_send_immediately = 0
+        self.packet_send_after_RREP = 0
+        self.RERR_count = 0
 
     def sendMessage(self, id: str, message: str):
         if id in self.nodes:
@@ -184,6 +190,7 @@ class AodvNode:
             dest_id = random.choice([id for id, _ in self.mnh.nodes.items()])
             #input("Name of destination node: ")
             #if it has destination route in its own table
+            self.mnh.packet_created += 1
             if (self.checkRoutingTable(dest_id)):
                 print("[LOG] I have active route to destination")
                 print("[DATA] Sending message...")
@@ -199,6 +206,7 @@ class AodvNode:
                 self.timer = self.TIMEOUT
                 self.neighbour_timeout_arg = self.getNextHop(dest_id)
                 self.mnh.sendMessage(self.getNextHop(dest_id), data)
+                self.mnh.packet_send_immediately += 1
                 self.showRoutingTable()
                 self.flag = "2"
             else:
@@ -213,6 +221,8 @@ class AodvNode:
                     self.mnh.sendMessage(x, RREQ)	
                     print("[RREQ]", self.nodeId,"->", x)
                     self.flag = "2"
+                
+                self.mnh.RREQ_count += 1
                     
         #receiving mode
         elif (self.flag == "2"):
@@ -306,6 +316,7 @@ class AodvNode:
 
                         # self.sock.sendto(data, tuple(self.getNextHop(dest_id)[1:]))
                         self.mnh.sendMessage(self.getNextHop(dest_id), data)
+                        self.mnh.packet_send_after_RREP += 1
                         self.showRoutingTable()
                     else:
                         #hop count incrementing
