@@ -157,6 +157,11 @@ class AodvNode:
         print("Timeout triggered for", neigh_id)
         self.showRoutingTable()
 
+    def move(self):
+        self.prev_coords = self.coords
+        self.coords = (random.uniform(self.coords[0]-1, self.coords[0]+1), random.uniform(self.coords[1]-1, self.coords[1]+1))
+
+
     def event_loop(self):
         self.timer = self.timer - 1
 
