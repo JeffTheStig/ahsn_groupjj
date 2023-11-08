@@ -28,8 +28,11 @@ class MainNodeHandler:
         return self.nodes
 
     def find_neighbours(self, max_range):
-        for node_x_id, node_x in self.nodes.items():
-            for node_y_id, node_y in self.nodes.items():
+        node_items = list(self.nodes.items())
+        for i in range(len(node_items)):
+            node_x_id, node_x = node_items[i]
+            for j in range(i + 1, len(node_items)):
+                node_y_id, node_y = node_items[j]
                 if node_x_id == node_y_id:
                     continue
 

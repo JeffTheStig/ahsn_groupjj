@@ -9,6 +9,9 @@ GRAPH_HEIGHT = 500
 NODE_COORD_WIDTH = 100
 NODE_COORD_HEIGHT = 100
 
+#max send/receive range of nodes
+MAX_RANGE = 10
+
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
     Takes the coordinates and image width and height and normalizes the coordintes.
@@ -139,6 +142,7 @@ def main_gui():
         if running and run_step < sim_steps:
             run_step += 1
             # while (1):
+            mnh.find_neighbours(MAX_RANGE)
             for _, n in mnh.nodes.items():
                 n.event_loop()
             #  time.sleep(0.010)
