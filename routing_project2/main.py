@@ -142,7 +142,7 @@ def main_gui():
 
         if event == "-NODES-" and values["-NODES-"].isdigit():
             nodes = int(values["-NODES-"])
-            reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes)
             print(f"Updated nodes to {nodes}")
 
         if event == "-RANGE-" and values["-RANGE-"].isdigit():
@@ -165,7 +165,7 @@ def main_gui():
 
         if run_step >= sim_steps:
             print("Finished!")
-            running, run_step, mnh, dots = reset_sim(window)
+            running, run_step, mnh, dots = reset_sim(window, nodes)
 
         window['-STEP-'].update(run_step)
         
