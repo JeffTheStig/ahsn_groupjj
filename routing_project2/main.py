@@ -9,6 +9,10 @@ GRAPH_HEIGHT = 500
 NODE_COORD_WIDTH = 100
 NODE_COORD_HEIGHT = 100
 
+LABEL_MOD_X = 1
+LABEL_MOD_Y = -1
+LABEL_SIZE = 9
+
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
     Takes the coordinates and image width and height and normalizes the coordintes.
@@ -32,13 +36,14 @@ def draw_nodes(window: sg.Window, nodes: list):
 
     dots = []
 
-    for _, n in nodes.items():
+    for l, n in nodes.items():
         x, y = n.coords
         gx, gy = normalize_graph_coords(x, y, NODE_COORD_WIDTH, NODE_COORD_HEIGHT, True)
         gx = gx * GRAP_WIDTH
         gy = gy * GRAPH_HEIGHT
         dot = window["-GRAPH-VIEW-"].DrawCircle((gx, gy), 5, fill_color='red')
-        dots.append((dot, (x,y)))
+        label = window["-GRAPH-VIEW-"].draw_text(l, (gx+LABEL_MOD_X, gy+LABEL_MOD_Y), color="black", text_location=sg.TEXT_LOCATION_CENTER, font=("Arial", LABEL_SIZE))
+        dots.append((dot, (x,y), label))
 
     return dots
 
@@ -55,6 +60,7 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
         gpx = gpx * GRAP_WIDTH
         gpy = gpy * GRAPH_HEIGHT
         graph.MoveFigure(dots[i][0], gx - gpx, gy - gpy)
+        graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y)
 
 def reset_sim(window: sg.Window):
     running = False
