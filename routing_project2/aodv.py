@@ -180,7 +180,9 @@ class AodvNode:
             self.neighbour_timeout()
         #sending mode
         if (self.flag == "1"):
-            dest_id = "dawood"#input("Name of destination node: ")
+            # dest_id = "dawood"
+            dest_id = random.choice([id for id, _ in self.mnh.nodes.items()])
+            #input("Name of destination node: ")
             #if it has destination route in its own table
             if (self.checkRoutingTable(dest_id)):
                 print("[LOG] I have active route to destination")
@@ -293,7 +295,7 @@ class AodvNode:
                         print("[DATA] Sending message...")
                         sender = [self.nodeId]
                         receiver = dest_id
-                        message = f"[{self.nodeId}] Samosay OR Pakoray milen gy...?"
+                        message = f"[{self.nodeId}] Hello World!"
                         #serialize data list into json
                         data = json.dumps(["DATA",sender,receiver,message])
                         # timer = Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(dest_id)[0]])
