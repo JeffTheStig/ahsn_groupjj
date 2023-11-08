@@ -1,5 +1,6 @@
 import time
 import PySimpleGUI as sg
+import random
 
 from aodv import *
 
@@ -166,11 +167,15 @@ def main_gui():
             run_step += 1
             # while (1):
             mnh.move_nodes(STEP_SIZE, NODE_COORD_WIDTH, NODE_COORD_HEIGHT)
+            move_dots(window, dots, mnh.nodes)
             mnh.find_neighbours(MAX_RANGE)
+            if run_step % 10 == 0:
+                sender_node = random.choice([id for id, n in mnh.nodes.items() if n.timer <= -1 and n.flag == "2"])
+                print(f"[MAIN] Node {sender_node} created package")
+                mnh.nodes[sender_node].flag = "1" # Set the node in sending mode.
             for _, n in mnh.nodes.items():
                 n.event_loop()
             #  time.sleep(0.010)
-            move_dots(window, dots, mnh.nodes)
 
         if run_step >= sim_steps:
             print("Finished!")

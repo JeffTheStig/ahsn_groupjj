@@ -222,7 +222,7 @@ class AodvNode:
                     # self.sock.sendto(RREQ, (neighbour_node[1], neighbour_node[2]))
                     self.mnh.sendMessage(x, RREQ, self.nodeId)	
                     print("[RREQ]", self.nodeId, "->", x)
-                    self.flag = "2"
+                self.flag = "2"
                 
                 self.mnh.RREQ_count += 1
                     
