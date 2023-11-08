@@ -9,8 +9,8 @@ class MainNodeHandler:
     def __init__(self):
         
         self.nodes = dict()
-        self.nodes["A"] = AodvNode(self, "A", ["B"], (0,0), ["B", "B", 0, "inf", ["B"], True])
-        self.nodes["B"] = AodvNode(self, "B", ["A"], (0,0), ["A", "A", 0, "inf", ["A"], True])
+        self.nodes["A"] = AodvNode(self, "A", ["B"], (50,50), ["B", "B", 0, "inf", ["B"], True])
+        self.nodes["B"] = AodvNode(self, "B", ["A"], (75,75), ["A", "A", 0, "inf", ["A"], True])
 
     def sendMessage(self, id: str, message: str):
         if id in self.nodes:
@@ -41,6 +41,7 @@ class AodvNode:
         self.mnh = mnh
         self.input_buff = []
         self.coords = coords
+        self.prev_coords = coords
         self.neighbour_timeout_arg = None
 
         print("---------------------------")
