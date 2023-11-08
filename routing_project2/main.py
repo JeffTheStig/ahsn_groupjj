@@ -12,6 +12,8 @@ NODE_COORD_HEIGHT = 100
 LABEL_MOD_X = 1
 LABEL_MOD_Y = -1
 LABEL_SIZE = 9
+#max send/receive range of nodes
+MAX_RANGE = 10
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -145,6 +147,7 @@ def main_gui():
         if running and run_step < sim_steps:
             run_step += 1
             # while (1):
+            mnh.find_neighbours(MAX_RANGE)
             for _, n in mnh.nodes.items():
                 n.event_loop()
             #  time.sleep(0.010)
