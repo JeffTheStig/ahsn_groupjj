@@ -9,8 +9,8 @@ GRAPH_HEIGHT = 500
 NODE_COORD_WIDTH = 100
 NODE_COORD_HEIGHT = 100
 
-LABEL_MOD_X = 1
-LABEL_MOD_Y = -1
+LABEL_MOD_X = 0
+LABEL_MOD_Y = 0
 LABEL_SIZE = 9
 #max send/receive range of nodes
 MAX_RANGE = 20
@@ -45,8 +45,9 @@ def draw_nodes(window: sg.Window, nodes: list):
         gx = gx * GRAP_WIDTH
         gy = gy * GRAPH_HEIGHT
         dot = window["-GRAPH-VIEW-"].DrawCircle((gx, gy), 5, fill_color='red')
+        r = window["-GRAPH-VIEW-"].DrawCircle((gx, gy), MAX_RANGE / NODE_COORD_WIDTH * GRAP_WIDTH, line_color='black')
         label = window["-GRAPH-VIEW-"].draw_text(l, (gx+LABEL_MOD_X, gy+LABEL_MOD_Y), color="black", text_location=sg.TEXT_LOCATION_CENTER, font=("Arial", LABEL_SIZE))
-        dots.append((dot, (x,y), label))
+        dots.append((dot, (x,y), label, r))
 
     return dots
 
@@ -62,8 +63,9 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
         gpx, gpy = normalize_graph_coords(px, py, NODE_COORD_WIDTH, NODE_COORD_HEIGHT, True)
         gpx = gpx * GRAP_WIDTH
         gpy = gpy * GRAPH_HEIGHT
-        graph.MoveFigure(dots[i][0], gx - gpx, gy - gpy)
-        graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y)
+        graph.MoveFigure(dots[i][0], gx - gpx, gy - gpy) # Dot
+        graph.MoveFigure(dots[i][3], gx - gpx, gy - gpy) # Range
+        graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y) # Label
 
 def reset_sim(window: sg.Window):
     running = False
@@ -80,6 +82,7 @@ def main_gui():
     Main function for the UI of the program.
     Creates the window and acts accordingly on mouse clicks.
     """
+    global MAX_RANGE
 
     # Total layout of the program. Also adds a terminal output window.
     layout = [
@@ -94,7 +97,8 @@ def main_gui():
                 [sg.Button("Pause", key="-PAUSE-")],
                 [sg.Button("Reset", key="-RESET-")],
                 [sg.HSeparator()],
-                [sg.Text("Nodes: "), sg.InputText(NUM_NODES, enable_events=True, key="-NODES-", size=(5, 1))],
+                [sg.Text("Nodes: "), sg.InputText("10", enable_events=True, key="-NODES-", size=(5, 1))],
+                [sg.Text("Node range: "), sg.InputText("10", enable_events=True, key="-RANGE-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
 
             ]),
@@ -137,12 +141,17 @@ def main_gui():
         if event == "-RESET-":
             running, run_step, mnh, dots = reset_sim(window)
 
-        if event == "-NODES-":
-            nodes = values["-NODES-"]
+        if event == "-NODES-" and values["-NODES-"].isdigit():
+            nodes = int(values["-NODES-"])
             print(f"Updated nodes to {nodes}")
 
-        if event == "-SIM-STEPS-":
-            sim_steps = values["-SIM-STEPS-"]
+        if event == "-RANGE-" and values["-RANGE-"].isdigit():
+            MAX_RANGE = int(values["-RANGE-"])
+            draw_nodes(window, mnh.nodes)
+            print(f"Updated range to {MAX_RANGE}")
+
+        if event == "-SIM-STEPS-" and values["-SIM-STEPS-"].isdigit():
+            sim_steps = int(values["-SIM-STEPS-"])
             print(f"Updated sim steps to {sim_steps}")
 
         if running and run_step < sim_steps:
