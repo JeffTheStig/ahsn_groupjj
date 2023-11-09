@@ -472,7 +472,7 @@ class AodvNode:
                         self.flag = "1"
 
                         print(f"===========================Sending reply from {source} to {destination} next round")
-                        self.mnh.reply_send += 1
+                        # self.mnh.reply_send += 1
                         self.mnh.packet_arrived += 1
                         self.showRoutingTable2()
                     #if data packet is received at intermediate node (not at destination)

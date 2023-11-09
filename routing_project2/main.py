@@ -233,10 +233,12 @@ def main_gui():
             print(f"RREQ send: {mnh.RREQ_send}")
             print(f"RREP send: {mnh.RREP_send}")
             print(f"RERR send: {mnh.RERR_send}")
+            print(f"packet send: {mnh.packet_send}")
+            print(f"reply send: {mnh.reply_send}")
             print(f"Packets arrived: ", mnh.packet_arrived)
             print(f"Replies arrived: ", mnh.reply_arrived)
-            total_packets = mnh.RREQ_send + mnh.RREQ_send + mnh.RERR_send + mnh.packet_send + mnh.reply_send
-            route_packets = mnh.RREQ_send + mnh.RREQ_send + mnh.RERR_send
+            total_packets = mnh.RREQ_send + mnh.RREP_send + mnh.RERR_send + mnh.packet_send + mnh.reply_send
+            route_packets = mnh.RREQ_send + mnh.RREP_send + mnh.RERR_send
             print(f"Routing overhead: {route_packets / total_packets * 100} %")
 
             table_entries = 0
