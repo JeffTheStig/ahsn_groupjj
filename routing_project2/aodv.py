@@ -5,12 +5,15 @@ import random
 import math
 from threading import Timer
 
+
+
 #------------------------------------------------------------------
 # Functions
 #------------------------------------------------------------------
 class MainNodeHandler:
-    def __init__(self, num_nodes):
+    def __init__(self, num_nodes, seed):
         self.nodes = dict()
+        random.seed(seed)
         for i in range(num_nodes):
             node_id = chr(ord('A') + i)
             neighbours = []
@@ -64,16 +67,21 @@ class MainNodeHandler:
     def move_nodes(self, max_dist, maxw, maxh):
         for _, node in self.nodes.items():
             node.prev_coords = node.coords
-            x_offset = random.uniform(-max_dist/4, max_dist/4)
-            y_offset = random.uniform(-max_dist/4, max_dist/4)
-            if node.prev_coords is not None:
-                prev_x, prev_y = node.prev_coords
-                curr_x, curr_y = node.coords
-                x_diff = curr_x - prev_x
-                y_diff = curr_y - prev_y
-                x_offset += random.uniform(-max_dist/8, max_dist/8) + x_diff/1.5
-                y_offset += random.uniform(-max_dist/8, max_dist/8) + y_diff/1.5
-            node.coords = (min(max(node.prev_coords[0] + x_offset, 0), maxw), min(max(node.prev_coords[1] + y_offset, 0), maxh))
+            node.coords = (min(max(random.uniform(node.coords[0] - max_dist / 2, node.coords[0] + max_dist / 2), 0), maxw),
+                       min(max(random.uniform(node.coords[1] - max_dist / 2, node.coords[1] + max_dist / 2), 0), maxh));
+
+        # for _, node in self.nodes.items():
+        #     node.prev_coords = node.coords
+        #     x_offset = random.uniform(-max_dist/4, max_dist/4)
+        #     y_offset = random.uniform(-max_dist/4, max_dist/4)
+        #     if node.prev_coords is not None:
+        #         prev_x, prev_y = node.prev_coords
+        #         curr_x, curr_y = node.coords
+        #         x_diff = curr_x - prev_x
+        #         y_diff = curr_y - prev_y
+        #         x_offset += random.uniform(-max_dist/8, max_dist/8) + x_diff/1.5
+        #         y_offset += random.uniform(-max_dist/8, max_dist/8) + y_diff/1.5
+        #     node.coords = (min(max(node.prev_coords[0] + x_offset, 0), maxw), min(max(node.prev_coords[1] + y_offset, 0), maxh))
 
 
         # print(self.nodeId, "moved from", self.prev_coords, "to", self.coords)

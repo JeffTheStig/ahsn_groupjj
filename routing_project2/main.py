@@ -14,9 +14,10 @@ LABEL_MOD_X = 0
 LABEL_MOD_Y = 0
 LABEL_SIZE = 9
 #max send/receive range of nodes
-MAX_RANGE = 20
-NUM_NODES = 20
-STEP_SIZE = 10
+MAX_RANGE = 10
+NUM_NODES = 10
+MOVEMENT_RANGE = 5
+SEED = 2023
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -69,10 +70,10 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
         graph.MoveFigure(dots[i][3], gx - gpx, gy - gpy) # Range
         graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y) # Label
 
-def reset_sim(window: sg.Window, nodes):
+def reset_sim(window: sg.Window, nodes, seed):
     running = False
     run_step = 0
-    mnh = MainNodeHandler(nodes)
+    mnh = MainNodeHandler(nodes, seed)
     dots = draw_nodes(window, mnh.nodes)
     print("Reset!")
 
@@ -85,7 +86,7 @@ def main_gui():
     Creates the window and acts accordingly on mouse clicks.
     """
     global MAX_RANGE
-    global STEP_SIZE
+    global MOVEMENT_RANGE
 
     # Total layout of the program. Also adds a terminal output window.
     layout = [
@@ -102,8 +103,9 @@ def main_gui():
                 [sg.HSeparator()],
                 [sg.Text("Nodes: "), sg.InputText("10", enable_events=True, key="-NODES-", size=(5, 1))],
                 [sg.Text("Node range: "), sg.InputText("10", enable_events=True, key="-RANGE-", size=(5, 1))],
-                [sg.Text("Node step size: "), sg.InputText("2", enable_events=True, key="-NODE-STEPS-", size=(5, 1))],
+                [sg.Text("Node movement range: "), sg.InputText("5", enable_events=True, key="-MOVEMENT-RANGE-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
+                [sg.Text("Seed: "), sg.InputText("2023", enable_events=True, key="-SEED-", size=(5, 1))],
 
             ]),
             sg.VSeperator(),
@@ -117,6 +119,7 @@ def main_gui():
     mnh = None
     running = False
     nodes = NUM_NODES
+    seed = SEED
     sim_steps = 100
     run_step = 0
     dots = []
@@ -127,7 +130,7 @@ def main_gui():
         event, values = window.read(timeout=20)
 
         if mnh == None:
-            mnh = MainNodeHandler(nodes)
+            mnh = MainNodeHandler(nodes, seed)
             dots = draw_nodes(window, mnh.nodes)
 
         # Close if event is exit.
@@ -143,11 +146,11 @@ def main_gui():
             running = False
 
         if event == "-RESET-":
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
         if event == "-NODES-" and values["-NODES-"].isdigit():
             nodes = int(values["-NODES-"])
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
             print(f"Updated nodes to {nodes}")
 
         if event == "-RANGE-" and values["-RANGE-"].isdigit():
@@ -155,18 +158,23 @@ def main_gui():
             draw_nodes(window, mnh.nodes)
             print(f"Updated range to {MAX_RANGE}")
 
-        if event == "-NODE-STEPS-" and values["-NODE-STEPS-"].isdigit():
-            STEP_SIZE = int(values["-NODE-STEPS-"])
-            print(f"Updated node step size to {STEP_SIZE}")
+        if event == "-MOVEMENT-RANGE-" and values["-MOVEMENT-RANGE-"].isdigit():
+            MOVEMENT_RANGE = int(values["-MOVEMENT-RANGE-"])
+            print(f"Updated node movement range to {MOVEMENT_RANGE}")
 
         if event == "-SIM-STEPS-" and values["-SIM-STEPS-"].isdigit():
             sim_steps = int(values["-SIM-STEPS-"])
             print(f"Updated sim steps to {sim_steps}")
 
+        if event == "-SEED-" and values["-SEED-"].isdigit():
+            seed = int(values["-SEED-"])
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
+            print(f"Updated seed to {seed}")
+
         if running and run_step < sim_steps:
             run_step += 1
             # while (1):
-            mnh.move_nodes(STEP_SIZE, NODE_COORD_WIDTH, NODE_COORD_HEIGHT)
+            mnh.move_nodes(MOVEMENT_RANGE, NODE_COORD_WIDTH, NODE_COORD_HEIGHT)
             move_dots(window, dots, mnh.nodes)
             mnh.find_neighbours(MAX_RANGE)
             if run_step % 10 == 0:
@@ -189,7 +197,7 @@ def main_gui():
             print(f"Amount of forwards for all data packets {mnh.packet_forwards}")
             print(f"Amount of times a timeout was triggered (path not found or responding. {mnh.timer_timeouts}")
             print(f"Amount of path traversals that where broken. {mnh.broken_paths}")
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
         window['-STEP-'].update(run_step)
         
