@@ -17,6 +17,7 @@ LABEL_SIZE = 9
 MAX_RANGE = 10
 NUM_NODES = 10
 STEP_SIZE = 5
+SEED = 2023
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -69,10 +70,10 @@ def move_dots(window: sg.Window, dots: list, nodes: list):
         graph.MoveFigure(dots[i][3], gx - gpx, gy - gpy) # Range
         graph.MoveFigure(dots[i][2], gx - gpx+LABEL_MOD_X, gy - gpy+LABEL_MOD_Y) # Label
 
-def reset_sim(window: sg.Window, nodes):
+def reset_sim(window: sg.Window, nodes, seed):
     running = False
     run_step = 0
-    mnh = MainNodeHandler(nodes)
+    mnh = MainNodeHandler(nodes, seed)
     dots = draw_nodes(window, mnh.nodes)
     print("Reset!")
 
@@ -104,6 +105,7 @@ def main_gui():
                 [sg.Text("Node range: "), sg.InputText("10", enable_events=True, key="-RANGE-", size=(5, 1))],
                 [sg.Text("Node step size: "), sg.InputText("5", enable_events=True, key="-NODE-STEPS-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
+                [sg.Text("Seed: "), sg.InputText("2023", enable_events=True, key="-SEED-", size=(5, 1))],
 
             ]),
             sg.VSeperator(),
@@ -117,6 +119,7 @@ def main_gui():
     mnh = None
     running = False
     nodes = NUM_NODES
+    seed = SEED
     sim_steps = 100
     run_step = 0
     dots = []
@@ -127,7 +130,7 @@ def main_gui():
         event, values = window.read(timeout=20)
 
         if mnh == None:
-            mnh = MainNodeHandler(nodes)
+            mnh = MainNodeHandler(nodes, seed)
             dots = draw_nodes(window, mnh.nodes)
 
         # Close if event is exit.
@@ -143,11 +146,11 @@ def main_gui():
             running = False
 
         if event == "-RESET-":
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
         if event == "-NODES-" and values["-NODES-"].isdigit():
             nodes = int(values["-NODES-"])
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
             print(f"Updated nodes to {nodes}")
 
         if event == "-RANGE-" and values["-RANGE-"].isdigit():
@@ -162,6 +165,11 @@ def main_gui():
         if event == "-SIM-STEPS-" and values["-SIM-STEPS-"].isdigit():
             sim_steps = int(values["-SIM-STEPS-"])
             print(f"Updated sim steps to {sim_steps}")
+
+        if event == "-SEED-" and values["-SEED-"].isdigit():
+            seed = int(values["-SEED-"])
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
+            print(f"Updated seed to {seed}")
 
         if running and run_step < sim_steps:
             run_step += 1
@@ -184,7 +192,7 @@ def main_gui():
             print(f"Total packets send immediately: {mnh.packet_send_immediately}")
             print(f"Total packets send after RREP: {mnh.packet_send_after_RREP}")
             print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send_immediately - mnh.packet_send_after_RREP}")
-            running, run_step, mnh, dots = reset_sim(window, nodes)
+            running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
         window['-STEP-'].update(run_step)
         

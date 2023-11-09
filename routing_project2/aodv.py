@@ -4,12 +4,15 @@ import os.path
 import random
 import math
 
+
+
 #------------------------------------------------------------------
 # Functions
 #------------------------------------------------------------------
 class MainNodeHandler:
-    def __init__(self, num_nodes):
+    def __init__(self, num_nodes, seed):
         self.nodes = dict()
+        random.seed(seed)
         for i in range(num_nodes):
             node_id = chr(ord('A') + i)
             neighbours = []
