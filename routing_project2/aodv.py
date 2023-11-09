@@ -62,8 +62,8 @@ class MainNodeHandler:
     def move_nodes(self, max_dist, maxw, maxh):
         for _, node in self.nodes.items():
             node.prev_coords = node.coords
-            node.coords = (random.uniform(node.coords[0] - max_dist / 2, node.coords[0] + max_dist / 2),
-                       random.uniform(node.coords[1] - max_dist / 2, node.coords[1] + max_dist / 2))
+            node.coords = (min(max(random.uniform(node.coords[0] - max_dist / 2, node.coords[0] + max_dist / 2), 0), maxw),
+                       min(max(random.uniform(node.coords[1] - max_dist / 2, node.coords[1] + max_dist / 2), 0), maxh));
 
         # for _, node in self.nodes.items():
         #     node.prev_coords = node.coords
