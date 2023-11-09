@@ -14,9 +14,9 @@ LABEL_MOD_X = 0
 LABEL_MOD_Y = 0
 LABEL_SIZE = 9
 #max send/receive range of nodes
-MAX_RANGE = 20
-NUM_NODES = 20
-STEP_SIZE = 10
+MAX_RANGE = 10
+NUM_NODES = 10
+STEP_SIZE = 5
 
 def normalize_graph_coords(x, y, w, h, invert_y = True):
     """
@@ -102,7 +102,7 @@ def main_gui():
                 [sg.HSeparator()],
                 [sg.Text("Nodes: "), sg.InputText("10", enable_events=True, key="-NODES-", size=(5, 1))],
                 [sg.Text("Node range: "), sg.InputText("10", enable_events=True, key="-RANGE-", size=(5, 1))],
-                [sg.Text("Node step size: "), sg.InputText("2", enable_events=True, key="-NODE-STEPS-", size=(5, 1))],
+                [sg.Text("Node step size: "), sg.InputText("5", enable_events=True, key="-NODE-STEPS-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
 
             ]),
