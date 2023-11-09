@@ -3,9 +3,11 @@ import sys, json, pickle
 import os.path
 import random
 import math
+import time
+
 from threading import Timer
 
-
+TIMEOUT = 50
 
 #------------------------------------------------------------------
 # Functions
@@ -23,13 +25,29 @@ class MainNodeHandler:
         
         self.RREQ_count = 0
         self.packet_created = 0
-        self.packet_send_immediately = 0
+        self.packet_send = 0
+        self.packet_arrived = 0
         self.packet_send_after_RREP = 0
+        self.reply_send = 0
+        self.reply_arrived = 0
 
         self.RREQ_forwards = 0
+        self.RREQ_send = 0
+        self.RREP_send = 0
+        self.RERR_send = 0
         self.packet_forwards = 0
         self.timer_timeouts = 0
         self.broken_paths = 0
+        self.RREP_after_in_rt = 0
+        self.TTL_timouts = 0
+
+        self.dsr = False
+        self.dsr_TTL = 10
+
+        self.packet_delay_s = 0
+        self.packet_delay_steps = 0
+
+        self.packets_created_main = 0
 
     def sendMessage(self, id: str, message: str, sender: str, timer_id: int):
         if id in self.nodes:
@@ -100,6 +118,8 @@ class AodvNode:
         self.dest_id = ""
         self.dest_seq = -1	
         self.RREQ = []
+        self.RREP_B = []
+        self.RREP_F = []
         self.RREP = []
         self.RERR = []
         self.TIMEOUT = 10
@@ -110,6 +130,10 @@ class AodvNode:
         self.prev_coords = coords
         self.neighbour_timeout_arg = None
         self.timer_count = 0
+        self.rreqs = dict()
+        self.message = []
+        self.replying = False
+        self.replying_prev_timer = -1
 
         # print("---------------------------")
         # print("node:", self.nodeId, " coordinates:", self.coords)
@@ -121,7 +145,7 @@ class AodvNode:
 
         #sending mode
         if (nodeId == "A"):
-            self.flag = "1"
+            self.flag = "0"
         else:
             self.flag = "2"
 
@@ -153,6 +177,24 @@ class AodvNode:
         # print("-----------------------------------------------------------------------------------")
         hello = "world"
 
+    def showRoutingTable2(self):
+        print("-----------------------------------------------------------------------------------")
+        print("|                                Routing Table                                    |")
+        print("-----------------------------------------------------------------------------------")
+        print("|  Destination  | Next Hop | Hop Count | Life Time | Destination Sequence | Valid |")
+        print("-----------------------------------------------------------------------------------")
+        for x in range(0,len(self.routingTable)):
+            dest = self.routingTable[x][0]
+            n_h = self.routingTable[x][1]
+            h_c = self.routingTable[x][2]
+            l_t = self.routingTable[x][3]
+            dest_sequence = self.routingTable[x][4]
+            valid = self.routingTable[x][5]
+
+            row = "|  "+dest+"| ".rjust(15-len(dest))+n_h+"|   ".rjust(13-len(n_h))+str(h_c)+"| ".rjust(10-len(str(h_c)))+l_t+" | ".rjust(10-len(l_t))+"   "+str(dest_sequence)+"| ".rjust(20-len(str(dest_sequence)))+" "+str(valid)+"    |"
+            print(row)
+        print("-----------------------------------------------------------------------------------")
+
     # def getNodeName(self, port):
     #     for x in self.neighbours.items():
     #         if (x[1][2] == port):
@@ -169,7 +211,7 @@ class AodvNode:
                 return x
 
     def sendRERR(self, destId, destSeq):
-        source = [self.nodeId]
+        source = self.nodeId
         dest_count = 1
         destSeq = destSeq+1
         RERR = ["RERR", source, dest_count, destId, destSeq]
@@ -179,6 +221,7 @@ class AodvNode:
             # self.sock.sendto(RERR, (neighbour_node[1], neighbour_node[2]))	
             self.mnh.sendMessage(x, RERR, self.nodeId, -1)
             print(f"[RERR] {self.nodeId}->{x}")
+        self.mnh.RERR_send += 1
 
     def neighbour_timeout(self, neigh_id):
         i = 0
@@ -191,12 +234,14 @@ class AodvNode:
             i+=1
         entry = self.getEntry(neigh_id)
         #destination and dest seq no
-        if entry != None:
-            self.sendRERR(neigh_id, entry[4])
-            print("Timeout triggered for", neigh_id)
+        # if entry != None:
+        self.sendRERR(neigh_id, entry[4])
+        # else:
+        #     self.sendRERR(neigh_id, -1)
+        print("Timeout triggered for", neigh_id)
         self.showRoutingTable()
 
-    def event_loop(self):
+    def event_loop(self, step):
         for i in self.timers:
             self.timers[i][0] = self.timers[i][0] - 1
 
@@ -208,30 +253,46 @@ class AodvNode:
         # if (self.timer == 0 and self.neighbour_timeout_arg != None):
         #     self.neighbour_timeout(self.neighbour_timeout_arg)
         #sending mode
+        if (self.flag == "0"):
+            self.dest_id = random.choice([id for id, _ in self.mnh.nodes.items() if id != self.nodeId])
+            print(f"[AODV] Node {self.nodeId} wants to send to {self.dest_id}")
+            self.flag = "1"
+            self.mnh.packet_created += 1
+
+            sender = self.nodeId
+            receiver = self.dest_id
+            message = f"[{self.nodeId}] Hello world!"
+            data = json.dumps(["DATA",sender,receiver,message])
+            self.message = data
+            
         if (self.flag == "1"):
             # dest_id = "dawood"
-            self.dest_id = random.choice([id for id, _ in self.mnh.nodes.items() if id != self.nodeId])
             #input("Name of destination node: ")
             #if it has destination route in its own table
-            self.mnh.packet_created += 1
             if (self.checkRoutingTable(self.dest_id)):
                 print("[LOG] I have active route to destination")
                 print("[DATA] Sending message...")
-                sender = [self.nodeId]
-                receiver = self.dest_id
-                message = f"[{self.nodeId}] Hello world!"
-                data = json.dumps(["DATA",sender,receiver,message])
+                # sender = self.nodeId
+                # receiver = self.dest_id
+                # message = f"[{self.nodeId}] Hello world!"
+                # data = json.dumps(["DATA",sender,receiver,message])
 
-                self.timer_count += 1
-                # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(self.dest_id)]), -1) # Storing timer and timerId of previous node
-                # self.timers[self.timer_count][0].start()
-                self.timers[self.timer_count] = [self.TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
-                # self.sock.sendto(data, tuple(self.getNextHop(self.dest_id)))
+                if self.replying:
+                    self.mnh.sendMessage(self.getNextHop(self.dest_id), self.message, self.nodeId, self.replying_prev_timer)
+                    self.replying = False
+                    self.mnh.reply_send += 1
+                else:
+                    self.timer_count += 1
+                    self.mnh.packet_send += 1
+                    # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(self.dest_id)]), -1) # Storing timer and timerId of previous node
+                    # self.timers[self.timer_count][0].start()
+                    self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
+                    # self.sock.sendto(data, tuple(self.getNextHop(self.dest_id)))
 
-                # self.timer = self.TIMEOUT
-                # self.neighbour_timeout_arg = self.getNextHop(self.dest_id)
-                self.mnh.sendMessage(self.getNextHop(self.dest_id), data, self.nodeId, self.timer_count)
-                self.mnh.packet_send_immediately += 1
+                    # self.timer = self.TIMEOUT
+                    # self.neighbour_timeout_arg = self.getNextHop(self.dest_id)
+                    self.mnh.sendMessage(self.getNextHop(self.dest_id), self.message, self.nodeId, self.timer_count)
+                    # self.mnh.packet_send_immediately += 1
                 self.showRoutingTable()
                 self.flag = "2"
             else:
@@ -240,11 +301,13 @@ class AodvNode:
                 #broadcasting RREQ to neighbours
                 for x in self.neighbours:
                     # neighbour_node = self.neighbours.get(ns[x])
-                    RREQ = ["RREQ", self.nodeId, self.seq_no, self.broadcast_no, self.dest_id, self.dest_seq, 0]
+                    RREQ = ["RREQ", self.nodeId, self.seq_no, self.broadcast_no, self.dest_id, self.dest_seq, 0, self.mnh.dsr_TTL]
                     RREQ = json.dumps(RREQ)
                     # self.sock.sendto(RREQ, (neighbour_node[1], neighbour_node[2]))
                     self.mnh.sendMessage(x, RREQ, self.nodeId, -1)	
                     print("[RREQ]", self.nodeId, "->", x)
+                self.mnh.RREQ_send += 1
+                self.rreqs[self.dest_id] = [step, time.time()]
                 self.flag = "2"
                 
                 self.mnh.RREQ_count += 1
@@ -258,61 +321,79 @@ class AodvNode:
                 self.showRoutingTable()
                 if (msg[0] == "RREQ"):
                     print("[RREQ]",self.nodeId, "<-", clientId)
-                    #if originator of RREQ is already in routing table or originator is receiving RREQ back to itself
-                    if (self.getEntry(msg[1]) is not None or msg[1] == self.nodeId):
-                        print(f"[DUP] {self.nodeId} Discarded RREQ from",  clientId)
+                    if self.mnh.dsr:
+                        msg[7] = msg[7] - 1 # Decrease TTL
+                    if msg[7] <= 0:
+                            print(f"[TTL] Timout on node {self.nodeId}, destination was {msg[4]}")
+                            self.mnh.TTL_timouts += 1
                     else:
-                        if (msg[1]!=self.nodeId):
-                            #add reverse entry in routing table
-                            self.routingTable.append([msg[1], clientId, msg[6]+1, self.life_time,msg[5],1])
+                        #if originator of RREQ is already in routing table or originator is receiving RREQ back to itself
+                        if (self.getEntry(msg[1]) is not None):
+                            print(f"[DUP] {self.nodeId} Discarded RREQ from",  msg[1])
+                            hello = "world"
+                        elif (msg[1] == self.nodeId):
+                            self.routingTable.append([clientId, clientId, 1, self.life_time, msg[5], 1])
                             print(f"Table update for {self.nodeId}: {self.routingTable[-1]}")
-                            #serialize the routing table
-                        
-                        #if node has destination route in routing table
-                        if (self.checkRoutingTable(msg[4])):
-                            print("[LOG] I have active route to destination")
-                            routeEntry = self.getEntry(msg[4])
-                            dest_seq = self.seq_no	#RFC3561: 6.6.2	
-                            RREP = ["RREP", routeEntry[0], dest_seq, msg[1], routeEntry[2], routeEntry[3]]
-                            RREP = json.dumps(RREP)
-                            
-                            # self.sock.sendto(RREP, tuple(self.getNextHop(msg[1][0])[1:]))
-                            self.mnh.sendMessage(self.getNextHop(msg[1]), RREP, self.nodeId, timerPrev)
-                            print("[RREP]", self.nodeId, "->", msg[1])
-                        #if routing entry is to be updated
                         else:
-                            #if originator of RREQ is not receiving RREQ back from it's neighbours
-                            destination = msg[4]		#destination_id
-                            #If RREQ is reached at destination
-                            if (self.nodeId == destination):
-                                print("[LOG] I'm the destination")
-                                dest_seq = msg[2]+1
-                                hop_count = 0
-                                RREP = ["RREP", self.nodeId, dest_seq, msg[1], hop_count, "infinite"]
-                                #serialize the RREP list into json
-                                RREP = json.dumps(RREP)
-                                #send data to Next_hop that leads to destination
+                            if (msg[1] != self.nodeId):
+                                #add reverse entry in routing table
+                                self.routingTable.append([msg[1], clientId, msg[6]+1, self.life_time, msg[5], 1])
+                                print(f"Table update for {self.nodeId}: {self.routingTable[-1]}")
+                                #serialize the routing table
+                            
+                            #if node has destination route in routing table
+                            if (self.checkRoutingTable(msg[4]) and not self.mnh.dsr):
+                                print("[LOG] I have active route to destination")
+                                self.mnh.RREP_after_in_rt += 1
+                                routeEntry = self.getEntry(msg[4])
+                                dest_seq = self.seq_no	#RFC3561: 6.6.2	
+                                RREP_B = ["RREP", routeEntry[0], dest_seq, msg[1], routeEntry[2], routeEntry[3]]
+                                RREP_B = json.dumps(RREP_B)
+
+                                RREP_F = ["RREP", routeEntry[0], dest_seq, msg[1], msg[6], routeEntry[3]]
+                                RREP_F = json.dumps(RREP_F)
+                                
                                 # self.sock.sendto(RREP, tuple(self.getNextHop(msg[1][0])[1:]))
-                                self.mnh.sendMessage(self.getNextHop(msg[1]), RREP, self.nodeId, timerPrev)
-                                print("[RREP]", self.nodeId, "->", self.getNextHop(msg[1]))
+                                self.mnh.sendMessage(self.getNextHop(msg[1]), RREP_B, self.nodeId, timerPrev)
+                                self.mnh.sendMessage(self.getNextHop(msg[4]), RREP_F, self.nodeId, -1)
+                                print("[RREP]", self.nodeId, "->", msg[1])
+                                self.mnh.RREP_send += 1
+                            #if routing entry is to be updated
                             else:
-                                print(f"[LOG] I don't have route to destination {destination} from RREQ")
-                                print("[LOG] Let me discover the route.")
-                                self.mnh.RREQ_forwards += 1
-                                #get node_ids of all neighbours
-                                # ns = list(self.neighbours.keys())
-                                #increment hop count
-                                msg[6] = msg[6]+1
-                                #broadcasting RREQ to neighbours
-                                for x in self.neighbours:
-                                    #get neighbour node => [node_id, node_ip, node_port]
-                                    # neighbour_node = self.neighbours.get(ns[x])
-                                    #serialize the RREQ list into json
-                                    RREQ = json.dumps(msg)
-                                    #send data to neighbours
-                                    # self.sock.sendto(RREQ, (neighbour_node[1], neighbour_node[2]))	
-                                    self.mnh.sendMessage(x, RREQ, self.nodeId, -1)
-                                    print("[RREQ]", self.nodeId,"->", x)
+                                #if originator of RREQ is not receiving RREQ back from it's neighbours
+                                destination = msg[4]		#destination_id
+                                #If RREQ is reached at destination
+                                if (self.nodeId == destination):
+                                    print("[LOG] I'm the destination")
+                                    dest_seq = msg[2]+1
+                                    hop_count = 0
+                                    RREP = ["RREP", self.nodeId, dest_seq, msg[1], hop_count, "infinite"]
+                                    #serialize the RREP list into json
+                                    RREP = json.dumps(RREP)
+                                    #send data to Next_hop that leads to destination
+                                    # self.sock.sendto(RREP, tuple(self.getNextHop(msg[1][0])[1:]))
+                                    self.mnh.sendMessage(self.getNextHop(msg[1]), RREP, self.nodeId, timerPrev)
+                                    print("[RREP]", self.nodeId, "->", self.getNextHop(msg[1]))
+                                    self.mnh.RREP_send += 1
+                                else:
+                                    print(f"[LOG] I don't have route to destination {destination} from RREQ")
+                                    print("[LOG] Let me discover the route.")
+                                    self.mnh.RREQ_forwards += 1
+                                    #get node_ids of all neighbours
+                                    # ns = list(self.neighbours.keys())
+                                    #increment hop count
+                                    msg[6] = msg[6]+1
+                                    #broadcasting RREQ to neighbours
+                                    for x in self.neighbours:
+                                        #get neighbour node => [node_id, node_ip, node_port]
+                                        # neighbour_node = self.neighbours.get(ns[x])
+                                        #serialize the RREQ list into json
+                                        RREQ = json.dumps(msg)
+                                        #send data to neighbours
+                                        # self.sock.sendto(RREQ, (neighbour_node[1], neighbour_node[2]))	
+                                        self.mnh.sendMessage(x, RREQ, self.nodeId, -1)
+                                        print("[RREQ]", self.nodeId,"->", x)
+                                    self.mnh.RREQ_send += 1
 
                 #if it is RREP packet
                 elif(msg[0] == "RREP"):
@@ -331,27 +412,33 @@ class AodvNode:
                     #if RREP is reached at originator of RREQ: means route found.
                     if (self.nodeId == msg[3]):
                         print("[SUCCESS] Route found")
-                        print("[DATA] Sending message...")
-                        sender = self.nodeId
-                        receiver = self.dest_id
-                        message = f"[{self.nodeId}] Hello World!"
-                        #serialize data list into json
-                        data = json.dumps(["DATA",sender,receiver,message])
-                        # timer = Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(dest_id)[0]])
-                        # timer.start()
+                        print("[DATA] Sending message...next round")
 
-                        self.timer_count += 1
-                        # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(self.dest_id)]), -1)
-                        # self.timers[self.timer_count][0].start()
-                        self.timers[self.timer_count] = [self.TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
+                        if msg[1] in self.rreqs:
+                            self.mnh.packet_delay_steps += step - self.rreqs[msg[1]][0]
+                            self.mnh.packet_delay_s += time.time() - self.rreqs[msg[1]][1]
+                            self.rreqs.pop(msg[1])
+                            self.mnh.packet_send_after_RREP += 1
+                        # sender = self.nodeId
+                        # receiver = self.dest_id
+                        # message = f"[{self.nodeId}] Hello World!"
+                        # #serialize data list into json
+                        # data = json.dumps(["DATA",sender,receiver,message])
+                        # # timer = Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(dest_id)[0]])
+                        # # timer.start()
 
-                        # self.timer = self.TIMEOUT
-                        # self.neighbour_timeout_arg = self.getNextHop(self.dest_id)
+                        # self.timer_count += 1
+                        # # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(self.dest_id)]), -1)
+                        # # self.timers[self.timer_count][0].start()
+                        # self.timers[self.timer_count] = [self.TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
 
-                        # self.sock.sendto(data, tuple(self.getNextHop(dest_id)[1:]))
-                        self.mnh.sendMessage(self.getNextHop(self.dest_id), data, self.nodeId, self.timer_count)
-                        self.mnh.packet_send_after_RREP += 1
-                        self.showRoutingTable()
+                        # # self.timer = self.TIMEOUT
+                        # # self.neighbour_timeout_arg = self.getNextHop(self.dest_id)
+
+                        # # self.sock.sendto(data, tuple(self.getNextHop(dest_id)[1:]))
+                        # self.mnh.sendMessage(self.getNextHop(self.dest_id), data, self.nodeId, self.timer_count)
+                        # self.showRoutingTable()
+                        self.flag = "1"
                     else:
                         #hop count incrementing
                         msg[4] = msg[4]+1		
@@ -375,7 +462,19 @@ class AodvNode:
                         data = json.dumps(["REPLYDATA",source,destination,message])
                         #send data to Next_hop that leads to originator of data msg
                         # self.sock.sendto(data, tuple(self.getNextHop(destination)[1:]))
-                        self.mnh.sendMessage(self.getNextHop(destination), data, self.nodeId, timerPrev)
+
+                        self.message = data
+                        self.replying = True
+                        self.replying_prev_timer = timerPrev
+                        self.dest_id = msg[1]
+
+                        # self.mnh.sendMessage(self.getNextHop(destination), data, self.nodeId, timerPrev)
+                        self.flag = "1"
+
+                        print(f"===========================Sending reply from {source} to {destination} next round")
+                        self.mnh.reply_send += 1
+                        self.mnh.packet_arrived += 1
+                        self.showRoutingTable2()
                     #if data packet is received at intermediate node (not at destination)
                     else:
                         if (self.checkRoutingTable(msg[2])):
@@ -386,7 +485,7 @@ class AodvNode:
                             self.timer_count += 1
                             # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(msg[2])]), timerPrev)
                             # self.timers[self.timer_count][0].start()
-                            self.timers[self.timer_count] = [self.TIMEOUT, self.neighbour_timeout, self.getNextHop(msg[2]), timerPrev] # Storing timer and timerId of previous node
+                            self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(msg[2]), timerPrev] # Storing timer and timerId of previous node
 
                             # self.timer = self.TIMEOUT
                             # self.neighbour_timeout_arg = self.getNextHop(msg[2])
@@ -409,10 +508,14 @@ class AodvNode:
                         # timer.cancel()
 
                         # self.timers[timerPrev][0].cancel()
+                        print(f"Node {self.nodeId} Canceling {timerPrev}")
                         self.timers.pop(timerPrev)
 
                         # self.timer = -1
                         print(msg[3])
+                        self.mnh.reply_arrived += 1
+                        print(f"===================================================Reply from {msg[1]} to {self.nodeId} arrived!")
+                        # self.showRoutingTable2()
                     #if packet is at intermediate node, forward it to next hop
                     else:
                         # timer.cancel()
@@ -422,6 +525,7 @@ class AodvNode:
                         # self.timers[timerPrev][0].cancel()
                         # Save to not use timer here. Node will not know that the link broke during transmission but the node we are sending to right now will
                         # not trigger its send timer. 
+                        print(f"Canceling {timerPrev}")
                         tn = self.timers.pop(timerPrev)[3]
 
                         # self.timer = self.TIMEOUT

@@ -106,6 +106,12 @@ def main_gui():
                 [sg.Text("Node movement range: "), sg.InputText("5", enable_events=True, key="-MOVEMENT-RANGE-", size=(5, 1))],
                 [sg.Text("Sim steps: "), sg.InputText("100", enable_events=True, key="-SIM-STEPS-", size=(5, 1))],
                 [sg.Text("Seed: "), sg.InputText("2023", enable_events=True, key="-SEED-", size=(5, 1))],
+                [sg.Text("Packets to send: "), sg.InputText("10", enable_events=True, key="-SEND-", size=(5, 1))],
+                [   
+                    sg.Text("Protocol selection: "),
+                    sg.Radio("AODV", "protocol", enable_events=True, size=(10,1), key="-AODV-", default=True),
+                    sg.Radio("DSR", "protocol", enable_events=True, size=(10,1), key="-DSR-")
+                ],
 
             ]),
             sg.VSeperator(),
@@ -123,6 +129,8 @@ def main_gui():
     sim_steps = 100
     run_step = 0
     dots = []
+    dsr = False
+    packets_to_send = 10
 
     # UI event loop. Acts on events (button presses etc...)
     while True:
@@ -171,32 +179,75 @@ def main_gui():
             running, run_step, mnh, dots = reset_sim(window, nodes, seed)
             print(f"Updated seed to {seed}")
 
+        if event == "-SEND-" and values["-SEND-"].isdigit():
+            packets_to_send = int(values["-SEND-"])
+            print(f"Updated packet to send to {packets_to_send}")
+
+        if event == "-AODV-":
+            dsr = False
+            mnh.dsr = dsr
+            print(f"Set protocol to AODV (dsr={dsr})")
+
+        if event == "-DSR-":
+            dsr = True
+            mnh.dsr = dsr
+            print(f"Set protocol to DSR (dsr={dsr})")
+
         if running and run_step < sim_steps:
             run_step += 1
             # while (1):
             mnh.move_nodes(MOVEMENT_RANGE, NODE_COORD_WIDTH, NODE_COORD_HEIGHT)
             move_dots(window, dots, mnh.nodes)
             mnh.find_neighbours(MAX_RANGE)
-            if run_step % 10 == 0:
-                sender_node = random.choice([id for id, n in mnh.nodes.items() if not n.timers and n.flag == "2"])
+            if run_step % int((sim_steps / packets_to_send) + 1) == 0:
+                sender_node = random.choice([id for id, n in mnh.nodes.items() if n.flag == "2" and not n.replying])
                 print(f"[MAIN] Node {sender_node} created package")
-                mnh.nodes[sender_node].flag = "1" # Set the node in sending mode.
+                mnh.nodes[sender_node].flag = "0" # Set the node in sending mode.
+                mnh.packets_created_main += 1
             for _, n in mnh.nodes.items():
-                n.event_loop()
+                n.event_loop(run_step)
             #  time.sleep(0.010)
 
         if run_step >= sim_steps:
             print("Finished!")
             print(f"RREQ send: {mnh.RREQ_count}")
             print(f"Total packets created: {mnh.packet_created}")
-            print(f"Total packets send immediately: {mnh.packet_send_immediately}")
+            print(f"Total packets send immediately: {mnh.packet_send - mnh.packet_send_after_RREP}")
             print(f"Total packets send after RREP: {mnh.packet_send_after_RREP}")
-            print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send_immediately - mnh.packet_send_after_RREP}")
-
+            print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send}")
+            print()
             print(f"Forwarded RouteRequests (node did not have route either) {mnh.RREQ_forwards}")
             print(f"Amount of forwards for all data packets {mnh.packet_forwards}")
             print(f"Amount of times a timeout was triggered (path not found or responding. {mnh.timer_timeouts}")
             print(f"Amount of path traversals that where broken. {mnh.broken_paths}")
+            print(f"Amount of times route was found in RoutingTable on intermediate node. {mnh.RREP_after_in_rt}")
+            print(f"Timeouts due to TTL on DSR. {mnh.TTL_timouts}")
+            print()
+            print(f"Total delay / discovery time (steps): {mnh.packet_delay_steps}")
+            print(f"Avg delay (steps): {mnh.packet_delay_steps / mnh.packet_send}") if mnh.packet_send > 0 else print(f"Avg delay (steps): 0")
+            print(f"Avg discovery time (steps): {mnh.packet_delay_steps / mnh.packet_send_after_RREP}") if mnh.packet_send_after_RREP > 0 else print(f"Avg discovery time (steps): 0")
+            print(f"Total delay / discovery time (s): {mnh.packet_delay_s} s")
+            print(f"Avg delay (s): {mnh.packet_delay_s / mnh.packet_send} s") if mnh.packet_send > 0 else print(f"Avg delay (s): 0")
+            print(f"Avg discovery time (s): {mnh.packet_delay_s / mnh.packet_send_after_RREP}") if mnh.packet_send_after_RREP > 0 else print(f"Avg discovery time (s): 0")
+            print()
+            print(f"RREQ send: {mnh.RREQ_send}")
+            print(f"RREP send: {mnh.RREP_send}")
+            print(f"RERR send: {mnh.RERR_send}")
+            print(f"Packets arrived: ", mnh.packet_arrived)
+            print(f"Replies arrived: ", mnh.reply_arrived)
+            total_packets = mnh.RREQ_send + mnh.RREQ_send + mnh.RERR_send + mnh.packet_send + mnh.reply_send
+            route_packets = mnh.RREQ_send + mnh.RREQ_send + mnh.RERR_send
+            print(f"Routing overhead: {route_packets / total_packets * 100} %")
+
+            table_entries = 0
+            for _, n in mnh.nodes.items():
+                for entry in n.routingTable:
+                    table_entries += 1
+            print(f"Total routing entries: {table_entries}")
+            print(f"Average routing table size: {table_entries / nodes}")
+            print()
+            print(f"packets_created_main {mnh.packets_created_main}")
+
             running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
         window['-STEP-'].update(run_step)
