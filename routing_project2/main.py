@@ -170,7 +170,7 @@ def main_gui():
             move_dots(window, dots, mnh.nodes)
             mnh.find_neighbours(MAX_RANGE)
             if run_step % 10 == 0:
-                sender_node = random.choice([id for id, n in mnh.nodes.items() if n.timer <= -1 and n.flag == "2"])
+                sender_node = random.choice([id for id, n in mnh.nodes.items() if not n.timers and n.flag == "2"])
                 print(f"[MAIN] Node {sender_node} created package")
                 mnh.nodes[sender_node].flag = "1" # Set the node in sending mode.
             for _, n in mnh.nodes.items():
@@ -184,6 +184,11 @@ def main_gui():
             print(f"Total packets send immediately: {mnh.packet_send_immediately}")
             print(f"Total packets send after RREP: {mnh.packet_send_after_RREP}")
             print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send_immediately - mnh.packet_send_after_RREP}")
+
+            print(f"Forwarded RouteRequests (node did not have route either) {mnh.RREQ_forwards}")
+            print(f"Amount of forwards for all data packets {mnh.packet_forwards}")
+            print(f"Amount of times a timeout was triggered (path not found or responding. {mnh.timer_timeouts}")
+            print(f"Amount of path traversals that where broken. {mnh.broken_paths}")
             running, run_step, mnh, dots = reset_sim(window, nodes)
 
         window['-STEP-'].update(run_step)
