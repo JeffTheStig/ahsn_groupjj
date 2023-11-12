@@ -160,7 +160,7 @@ class AodvNode:
 
     def checkRoutingTable(self, dest):
         all_dest = [x[0] for x in self.routingTable]
-        if (dest in all_dest):
+        if (dest in all_dest and self.getEntry(dest)[5] == 1):
             return True
         return False
 
@@ -559,7 +559,7 @@ class AodvNode:
                         next_hop_id = x[1]
                         if (destination_id == next_hop_id):
                             self.routingTable[i][5] = 0
-                        i+=1
+                            i+=1
                     #if routingTable doesn't have any entry that has infected next hop
                     if (i == 0):
                         pass
