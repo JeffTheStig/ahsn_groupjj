@@ -56,6 +56,7 @@ class MainNodeHandler:
                 self.nodes[id].receiveMessage(sender, message, timer_id)
             else:
                 print(f"[ERROR] Receiving node {id} not in range of sender {sender} anymore!")
+                self.nodes[sender].neighbour_timeout(id)
                 self.neighbour_oo_range += 1
 
     def getNodes(self):
@@ -128,7 +129,7 @@ class AodvNode:
         self.RREP = []
         self.RERR = []
         self.TIMEOUT = 10
-        self.timers = dict()
+        # self.timers = dict()
         self.mnh = mnh
         self.input_buff = []
         self.coords = coords
@@ -239,19 +240,19 @@ class AodvNode:
             i+=1
         entry = self.getEntry(neigh_id)
         #destination and dest seq no
-        # if entry != None:
-        self.sendRERR(neigh_id, entry[4])
+        if entry != None:
+            self.sendRERR(neigh_id, entry[4])
         # else:
         #     self.sendRERR(neigh_id, -1)
         print("Timeout triggered for", neigh_id)
         self.showRoutingTable()
 
     def event_loop(self, step):
-        for i in self.timers:
-            self.timers[i][0] = self.timers[i][0] - 1
+        # for i in self.timers:
+        #     self.timers[i][0] = self.timers[i][0] - 1
 
-            if self.timers[i][0] == 0:
-                self.timers[i][1](self.timers[i][2]) # If timer ran out, trigger function
+        #     if self.timers[i][0] == 0:
+        #         self.timers[i][1](self.timers[i][2]) # If timer ran out, trigger function
 
         # self.timer = self.timer - 1
 
@@ -287,11 +288,11 @@ class AodvNode:
                     self.replying = False
                     self.mnh.reply_send += 1
                 else:
-                    self.timer_count += 1
+                    # self.timer_count += 1
                     self.mnh.packet_send += 1
                     # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(self.dest_id)]), -1) # Storing timer and timerId of previous node
                     # self.timers[self.timer_count][0].start()
-                    self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
+                    # self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(self.dest_id), -1] # Storing timer and timerId of previous node
                     # self.sock.sendto(data, tuple(self.getNextHop(self.dest_id)))
 
                     # self.timer = self.TIMEOUT
@@ -335,12 +336,15 @@ class AodvNode:
                     else:
                         # if originator of RREQ is already in routing table or originator is receiving RREQ back to itself
                         curr_entry = self.getEntry(msg[1])
+
+                        if (curr_entry is not None and curr_entry[4] > msg[6]+1): # If current hopcount is bigger then request hopcount, delete reverse entry.
+                            self.routingTable.remove(curr_entry)
                         
                         if (curr_entry is not None): # If there is already an entry:
                             print(f"[DUP] {self.nodeId} Discarded RREQ from",  msg[1])
                         elif (msg[1] == self.nodeId):
-                            if (self.getEntry(clientId) is not None): # If we are the sender and there is already a route present
-                                self.routingTable.remove(self.getEntry(clientId))
+                            # if (self.getEntry(clientId) is not None): # If we are the sender and there is already a route present
+                            #     self.routingTable.remove(self.getEntry(clientId))
                             self.routingTable.append([clientId, clientId, 1, self.life_time, msg[5], 1])
                             print(f"Table update for {self.nodeId}: {self.routingTable[-1]}")
                         else:
@@ -491,11 +495,11 @@ class AodvNode:
                             # timer = Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(msg[2])[0]])
                             # timer.start()
 
-                            self.timer_count += 1
-                            # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(msg[2])]), timerPrev)
-                            # self.timers[self.timer_count][0].start()
-                            self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(msg[2]), timerPrev] # Storing timer and timerId of previous node
-                            print(f"Node {self.nodeId} created timer: {self.timer_count}")
+                            # self.timer_count += 1
+                            # # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(msg[2])]), timerPrev)
+                            # # self.timers[self.timer_count][0].start()
+                            # self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(msg[2]), timerPrev] # Storing timer and timerId of previous node
+                            # print(f"Node {self.nodeId} created timer: {self.timer_count}")
                             # self.timer = self.TIMEOUT 
                             # self.neighbour_timeout_arg = self.getNextHop(msg[2])
 
@@ -516,9 +520,9 @@ class AodvNode:
                     if (destination_id == self.nodeId):
                         # timer.cancel()
 
-                        # self.timers[timerPrev][0].cancel()
-                        print(f"Node {self.nodeId} Canceling {timerPrev}")
-                        self.timers.pop(timerPrev)
+                        # # self.timers[timerPrev][0].cancel()
+                        # print(f"Node {self.nodeId} Canceling {timerPrev}")
+                        # self.timers.pop(timerPrev)
 
                         # self.timer = -1
                         print(msg[3])
@@ -534,8 +538,8 @@ class AodvNode:
                         # self.timers[timerPrev][0].cancel()
                         # Save to not use timer here. Node will not know that the link broke during transmission but the node we are sending to right now will
                         # not trigger its send timer. 
-                        print(f"Node {self.nodeId} canceling timer {timerPrev}")
-                        tn = self.timers.pop(timerPrev)[3]
+                        # print(f"Node {self.nodeId} canceling timer {timerPrev}")
+                        # tn = self.timers.pop(timerPrev)[3]
 
                         # self.timer = self.TIMEOUT
                         # self.neighbour_timeout_arg = self.getNextHop(destination_id)
@@ -544,7 +548,8 @@ class AodvNode:
                         print("[LOG] forwarding message to", self.getNextHop(destination_id))
                         data = json.dumps(msg)
                         # self.sock.sendto(data, tuple(self.getNextHop(destination_id)[1:]))
-                        self.mnh.sendMessage(self.getNextHop(destination_id), data, self.nodeId, tn)
+                        # self.mnh.sendMessage(self.getNextHop(destination_id), data, self.nodeId, tn)
+                        self.mnh.sendMessage(self.getNextHop(destination_id), data, self.nodeId, -1)
 
                 #if it is RERR packet
                 elif (msg[0] == "RERR"):
