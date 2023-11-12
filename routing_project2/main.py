@@ -217,18 +217,18 @@ def main_gui():
             print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send}")
             print(f"Neighbour got out of range. {mnh.neighbour_oo_range}")
             print()
-            print(f"Forwarded RouteRequests (node did not have route either) {mnh.RREQ_forwards}")
-            print(f"Amount of forwards for all data packets {mnh.packet_forwards}")
-            print(f"Amount of times a timeout was triggered (path not found or responding. {mnh.timer_timeouts}")
-            print(f"Amount of path traversals that where broken. {mnh.broken_paths}")
-            print(f"Amount of times route was found in RoutingTable on intermediate node. {mnh.RREP_after_in_rt}")
-            print(f"Timeouts due to TTL on DSR. {mnh.TTL_timouts}")
+            print(f"Forwarded RouteRequests (node did not have route either): {mnh.RREQ_forwards}")
+            print(f"Amount of forwards for all data packets: {mnh.packet_forwards}")
+            print(f"Amount of times a timeout was triggered (path not found or responding: {mnh.timer_timeouts}")
+            print(f"Amount of path traversals that where broken: {mnh.broken_paths}")
+            print(f"Amount of times route was found in RoutingTable on intermediate node: {mnh.RREP_after_in_rt}")
+            print(f"Timeouts due to TTL on DSR: {mnh.TTL_timouts}")
             print()
             print(f"Total delay / discovery time (steps): {mnh.packet_delay_steps}")
             print(f"Avg delay (steps): {mnh.packet_delay_steps / mnh.packet_send}") if mnh.packet_send > 0 else print(f"Avg delay (steps): 0")
             print(f"Avg discovery time (steps): {mnh.packet_delay_steps / mnh.packet_send_after_RREP}") if mnh.packet_send_after_RREP > 0 else print(f"Avg discovery time (steps): 0")
-            print(f"Total delay / discovery time (s): {mnh.packet_delay_s} s")
-            print(f"Avg delay (s): {mnh.packet_delay_s / mnh.packet_send} s") if mnh.packet_send > 0 else print(f"Avg delay (s): 0")
+            print(f"Total delay / discovery time (s): {mnh.packet_delay_s}")
+            print(f"Avg delay (s): {mnh.packet_delay_s / mnh.packet_send}") if mnh.packet_send > 0 else print(f"Avg delay (s): 0")
             print(f"Avg discovery time (s): {mnh.packet_delay_s / mnh.packet_send_after_RREP}") if mnh.packet_send_after_RREP > 0 else print(f"Avg discovery time (s): 0")
             print()
             print(f"RREQ send: {mnh.RREQ_send}")
@@ -240,7 +240,7 @@ def main_gui():
             print(f"Replies arrived: ", mnh.reply_arrived)
             total_packets = mnh.RREQ_send + mnh.RREP_send + mnh.RERR_send + mnh.packet_send + mnh.reply_send
             route_packets = mnh.RREQ_send + mnh.RREP_send + mnh.RERR_send
-            print(f"Routing overhead: {route_packets / total_packets * 100} %")
+            print(f"Routing overhead % : {route_packets / total_packets * 100}")
 
             table_entries = 0
             for _, n in mnh.nodes.items():
@@ -249,7 +249,7 @@ def main_gui():
             print(f"Total routing entries: {table_entries}")
             print(f"Average routing table size: {table_entries / nodes}")
             print()
-            print(f"packets_created_main {mnh.packets_created_main}")
+            print(f"packets_created_main: {mnh.packets_created_main}")
 
             running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
