@@ -210,11 +210,12 @@ def main_gui():
 
         if run_step >= sim_steps:
             print("Finished!")
-            print(f"RREQ send: {mnh.RREQ_count}")
+            print(f"Tried to send packet, but had to create RREQ instead: {mnh.RREQ_count}")
             print(f"Total packets created: {mnh.packet_created}")
             print(f"Total packets send immediately: {mnh.packet_send - mnh.packet_send_after_RREP}")
             print(f"Total packets send after RREP: {mnh.packet_send_after_RREP}")
             print(f"Total packets dropped, no route: {mnh.packet_created - mnh.packet_send}")
+            print(f"Neighbour got out of range. {mnh.neighbour_oo_range}")
             print()
             print(f"Forwarded RouteRequests (node did not have route either) {mnh.RREQ_forwards}")
             print(f"Amount of forwards for all data packets {mnh.packet_forwards}")

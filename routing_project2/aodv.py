@@ -40,6 +40,7 @@ class MainNodeHandler:
         self.broken_paths = 0
         self.RREP_after_in_rt = 0
         self.TTL_timouts = 0
+        self.neighbour_oo_range = 0
 
         self.dsr = False
         self.dsr_TTL = 10
@@ -50,8 +51,12 @@ class MainNodeHandler:
         self.packets_created_main = 0
 
     def sendMessage(self, id: str, message: str, sender: str, timer_id: int):
-        if id in self.nodes:
-            self.nodes[id].receiveMessage(sender, message, timer_id)
+        if id in self.nodes and sender in self.nodes:
+            if id in self.nodes[sender].neighbours:
+                self.nodes[id].receiveMessage(sender, message, timer_id)
+            else:
+                print(f"[ERROR] Receiving node {id} not in range of sender {sender} anymore!")
+                self.neighbour_oo_range += 1
 
     def getNodes(self):
         return self.nodes
@@ -293,7 +298,7 @@ class AodvNode:
                     # self.neighbour_timeout_arg = self.getNextHop(self.dest_id)
                     self.mnh.sendMessage(self.getNextHop(self.dest_id), self.message, self.nodeId, self.timer_count)
                     # self.mnh.packet_send_immediately += 1
-                self.showRoutingTable()
+                self.showRoutingTable2()
                 self.flag = "2"
             else:
                 print(f"[LOG] I don't have route to destination {self.dest_id}")
@@ -320,6 +325,7 @@ class AodvNode:
                 #if it is RREQ packet
                 self.showRoutingTable()
                 if (msg[0] == "RREQ"):
+                    #["RREQ", src_id, src_seq, src_brdcst, dest_id, dest_seq, hops]
                     print("[RREQ]",self.nodeId, "<-", clientId)
                     if self.mnh.dsr:
                         msg[7] = msg[7] - 1 # Decrease TTL
@@ -327,11 +333,14 @@ class AodvNode:
                             print(f"[TTL] Timout on node {self.nodeId}, destination was {msg[4]}")
                             self.mnh.TTL_timouts += 1
                     else:
-                        #if originator of RREQ is already in routing table or originator is receiving RREQ back to itself
-                        if (self.getEntry(msg[1]) is not None):
+                        # if originator of RREQ is already in routing table or originator is receiving RREQ back to itself
+                        curr_entry = self.getEntry(msg[1])
+                        
+                        if (curr_entry is not None): # If there is already an entry:
                             print(f"[DUP] {self.nodeId} Discarded RREQ from",  msg[1])
-                            hello = "world"
                         elif (msg[1] == self.nodeId):
+                            if (self.getEntry(clientId) is not None): # If we are the sender and there is already a route present
+                                self.routingTable.remove(self.getEntry(clientId))
                             self.routingTable.append([clientId, clientId, 1, self.life_time, msg[5], 1])
                             print(f"Table update for {self.nodeId}: {self.routingTable[-1]}")
                         else:
@@ -486,8 +495,8 @@ class AodvNode:
                             # self.timers[self.timer_count] = (Timer(self.TIMEOUT, self.neighbour_timeout, [self.getNextHop(msg[2])]), timerPrev)
                             # self.timers[self.timer_count][0].start()
                             self.timers[self.timer_count] = [TIMEOUT, self.neighbour_timeout, self.getNextHop(msg[2]), timerPrev] # Storing timer and timerId of previous node
-
-                            # self.timer = self.TIMEOUT
+                            print(f"Node {self.nodeId} created timer: {self.timer_count}")
+                            # self.timer = self.TIMEOUT 
                             # self.neighbour_timeout_arg = self.getNextHop(msg[2])
 
                             # print that forwarding message to next hop
@@ -525,7 +534,7 @@ class AodvNode:
                         # self.timers[timerPrev][0].cancel()
                         # Save to not use timer here. Node will not know that the link broke during transmission but the node we are sending to right now will
                         # not trigger its send timer. 
-                        print(f"Canceling {timerPrev}")
+                        print(f"Node {self.nodeId} canceling timer {timerPrev}")
                         tn = self.timers.pop(timerPrev)[3]
 
                         # self.timer = self.TIMEOUT
