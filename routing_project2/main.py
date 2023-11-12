@@ -248,7 +248,7 @@ def main_gui():
             print(f"Total routing entries: {table_entries}")
             print(f"Average routing table size: {table_entries / nodes}")
             print()
-            print(f"packets_created_main {mnh.packets_created_main}")
+            print(f"packets_created_main: {mnh.packets_created_main}")
 
             running, run_step, mnh, dots = reset_sim(window, nodes, seed)
 
