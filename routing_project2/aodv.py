@@ -557,7 +557,7 @@ class AodvNode:
                     i = 0
                     for x in self.routingTable:
                         next_hop_id = x[1]
-                        if (destination_id == next_hop_id):
+                        if (destination_id == next_hop_id and self.routingTable[i][5] == 1):
                             self.routingTable[i][5] = 0
                             i+=1
                     #if routingTable doesn't have any entry that has infected next hop
